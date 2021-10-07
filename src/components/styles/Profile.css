@@ -1,0 +1,42 @@
+.profile {
+  max-width: 960px;
+  margin: 0px auto;
+}
+
+.profileDetail {
+  margin: 18px 0px;
+  border-bottom: 1px solid grey;
+}
+
+.profileBox {
+  display: flex;
+  justify-content: center;
+}
+
+.myDetails {
+  margin: 10px;
+}
+
+.profileImg {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  margin: 16px;
+}
+
+.socialDetails {
+  display: flex;
+  justify-content: space-between;
+  width: 108%;
+}
+
+.profileGallery {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.galleryImg {
+  width: 30%;
+  margin-bottom: 28px;
+}

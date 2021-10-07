@@ -1,0 +1,13 @@
+.logo {
+  width: 5vh;
+  margin: 2vh;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+}
+
+.nav-wrapper.main {
+  background-color: #ffd145;
+}
