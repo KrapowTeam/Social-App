@@ -6,8 +6,12 @@ import user from '../assets/login.png';
 import key from '../assets/key.png';
 import post from '../assets/add.png';
 import './styles/Navbar.css';
+import { UserContext } from '../App';
+
 export default function Navbar() {
-  return (
+  const { state, dispatch } = React.useContext(UserContext);
+
+  return state ? (
     <nav>
       <div className='nav-wrapper main'>
         <img src={Logo} className='logo' alt='logoIcon' />
@@ -39,5 +43,5 @@ export default function Navbar() {
         </ul>
       </div>
     </nav>
-  );
+  ) : null;
 }

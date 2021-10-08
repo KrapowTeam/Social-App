@@ -2,6 +2,7 @@ import React from 'react';
 import '../styles/Profile.css';
 import { faHeart, faCog, faComment } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { UserContext } from '../../App';
 const posts = [
   {
     picture:
@@ -22,6 +23,7 @@ const posts = [
   },
 ];
 export default function Profile() {
+  const { state, dispatch } = React.useContext(UserContext);
   return (
     <>
       <div className='all'>
@@ -34,9 +36,9 @@ export default function Profile() {
                 alt=''
               />
             </div>
-
+            {console.log(state)}
             <div className='profile-user-settings'>
-              <h1 className='profile-user-name'>stonk_</h1>
+              <h1 className='profile-user-name'>stonk_{state.name}</h1>
 
               <button className='btnp profile-edit-btnp'>Edit Profile</button>
 
