@@ -1,11 +1,12 @@
 .logo {
   width: 5vh;
-  margin: 2vh;
+  margin: 1.8vh;
 }
 
 .icon {
   width: 16px;
   height: 16px;
+  margin-top: 3vh;
 }
 
 .nav-wrapper.main {

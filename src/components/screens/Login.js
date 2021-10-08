@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { UserContext } from '../../App';
 import '../styles/Login.css';
 import { Link, useHistory } from 'react-router-dom';
 import M from 'materialize-css';
@@ -38,8 +39,9 @@ export default function Login() {
   const [confirmRegis, setConfirmRegis] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [email, setEmail] = React.useState('');
-  const [noticePass, setNoticePass] = React.useState(false);
-  const getLogin = () => {
+  const [notice, setNotice] = React.useState(false);
+  const { state, dispatch } = React.useContext(UserContext);
+  const GetLogin = () => {
     if (
       !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
         email
@@ -67,8 +69,11 @@ export default function Login() {
           M.toast({ html: data.error, classes: '#c62828 red darken-3' });
         } else {
           console.log(data);
+          localStorage.setItem('jwt', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          dispatch({ type: 'USER', payload: data.user });
           M.toast({ html: data.message, classes: '#43a047 green darken-1' });
-          // history.push('./login');
+          history.push('/');
         }
       });
   };
@@ -84,9 +89,9 @@ export default function Login() {
       });
       return;
     }
-    if (passwordRegis.length < 8 || passwordRegis.length > 16) {
+    if (passwordRegis.length < 8 || passwordRegis.length > 19) {
       M.toast({
-        html: 'Password must be 8-16 characters',
+        html: 'Password must be 8-19 characters',
         classes: '#c62828 red darken-3',
       });
       return;
@@ -98,6 +103,26 @@ export default function Login() {
       });
       return;
     }
+    fetch('/signup', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: nameRegis,
+        email: emailRegis,
+        password: passwordRegis,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          M.toast({ html: data.error, classes: '#c62828 red darken-3' });
+        } else {
+          console.log(data);
+          M.toast({ html: data.message, classes: '#43a047 green darken-1' });
+        }
+      });
   };
   return (
     <div className='form-structor'>
@@ -128,12 +153,12 @@ export default function Login() {
             onChange={(e) => {
               setPasswordRegis(e.target.value);
             }}
-            onMouseEnter={(e) => setNoticePass(true)}
-            onMouseLeave={(e) => setNoticePass(false)}
+            onMouseEnter={(e) => setNotice(true)}
+            onMouseLeave={(e) => setNotice(false)}
           />
-          {noticePass ? (
+          {notice ? (
             <span className='popuptext'>
-              At least 8 characters, must contain at least one lower-case
+              At least 8-19 characters, must contain at least one lower-case
               letter, one upper-case letter, one digit and a special character
             </span>
           ) : null}
@@ -184,7 +209,7 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <button className='submit-btn' onClick={() => getLogin()}>
+          <button className='submit-btn' onClick={() => GetLogin()}>
             Log in
           </button>
           <div className='line'>

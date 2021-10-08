@@ -13,11 +13,11 @@ export default function Navbar() {
         <img src={Logo} className='logo' alt='logoIcon' />
 
         <ul id='nav-mobile' className='right'>
-          <li>
+          {/* <li>
             <Link to='/'>
               <img src={Home} className='icon' alt='homeIcon' />
             </Link>
-          </li>
+          </li> */}
           <li>
             <Link to='/Login'>
               <img src={key} className='icon' alt='loginIcon' />

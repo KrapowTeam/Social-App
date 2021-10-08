@@ -295,12 +295,13 @@
   width: 280px;
   background-color: rgba(205, 205, 205, 0.8);
   color: #000;
+  font-size: 0.8vw;
   text-align: center;
   border-radius: 6px;
   padding: 8px 0;
   position: absolute;
   z-index: 1;
-  bottom: 15%;
+  bottom: 25%;
   left: -10%;
 }
 
