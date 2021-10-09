@@ -1,29 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import '../styles/Profile.css';
 import { faHeart, faCog, faComment } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UserContext } from '../../App';
-const posts = [
-  {
-    picture:
-      'https://i.pinimg.com/originals/b8/4b/fe/b84bfeb8bae7626de264f259fd4e7c4c.jpg',
-    like: 56,
-    comment: 2,
-  },
-  {
-    picture: 'https://cdn.kapwing.com/video_image-5nBqxYZRz.jpg',
-    like: 1011,
-    comment: 81,
-  },
-  {
-    picture:
-      'https://i.pinimg.com/736x/4f/38/18/4f38183f63037430ea022c730c88b5fc.jpg',
-    like: 92,
-    comment: 30,
-  },
-];
+
 export default function Profile() {
-  const { state, dispatch } = React.useContext(UserContext);
+  const [mypics, setPics] = useState([]);
+  const { state, dispatch } = useContext(UserContext);
+
+  useEffect(() => {
+    fetch('/myposts', {
+      method: 'get',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('jwt'),
+      },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result.mypost);
+        setPics(result.mypost);
+      });
+  }, []);
+
   return (
     <>
       <div className='all'>
@@ -36,9 +34,9 @@ export default function Profile() {
                 alt=''
               />
             </div>
-            {console.log(state)}
+
             <div className='profile-user-settings'>
-              <h1 className='profile-user-name'>stonk_{state.name}</h1>
+              <h1 className='profile-user-name'>{state.name}</h1>
 
               <button className='btnp profile-edit-btnp'>Edit Profile</button>
 
@@ -77,13 +75,14 @@ export default function Profile() {
         </div>
         <div className='container'>
           <div className='gallery'>
-            {posts.map((post) => (
+            {mypics.map((item) => (
               <div className='gallery-item' tabindex='0'>
                 <img
                   className='pimg'
-                  src={post.picture}
+                  key={item._id}
+                  src={item.photo}
                   className='gallery-image'
-                  alt=''
+                  alt={item.title}
                 />
 
                 <div className='gallery-item-info'>
@@ -94,7 +93,7 @@ export default function Profile() {
                         icon={faHeart}
                         aria-hidden='true'
                       ></FontAwesomeIcon>{' '}
-                      {post.like}
+                      1
                     </li>
                     <li className='gallery-item-comments'>
                       <span className='visually-hidden'>Comments:</span>
@@ -102,14 +101,13 @@ export default function Profile() {
                         icon={faComment}
                         aria-hidden='true'
                       ></FontAwesomeIcon>{' '}
-                      {post.comment}
+                      2
                     </li>
                   </ul>
                 </div>
               </div>
             ))}
           </div>
-          <div class='loader'></div>
         </div>
       </div>
     </>

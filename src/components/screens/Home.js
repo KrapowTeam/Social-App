@@ -3,7 +3,9 @@ import '../styles/Home.css';
 import Love from '../../assets/heart.png';
 import LoveFilled from '../../assets/heart1.png';
 export default function Home() {
-  const [data, setData] = React.useState([]);
+  const [data, setData] = React.useState([
+    { photo: '', title: '', body: '', postedBy: { name: '' } },
+  ]);
   React.useEffect(() => {
     fetch('/allpost', {
       headers: {
@@ -18,12 +20,6 @@ export default function Home() {
   }, []);
   return (
     <div className='home'>
-      {data.map((item) => {
-        console.log('photo', item.photo);
-        console.log('photo', item.title);
-        console.log('photo', item.body);
-        console.log('photo', item.postedBy);
-      })}
       {data.map((item) => {
         return (
           <>

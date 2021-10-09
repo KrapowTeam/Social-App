@@ -3,6 +3,7 @@ import { UserContext } from '../../App';
 import '../styles/Login.css';
 import { Link, useHistory } from 'react-router-dom';
 import M from 'materialize-css';
+import validator from 'validator';
 
 function move() {
   console.clear();
@@ -11,22 +12,22 @@ function move() {
   loginBtn.addEventListener('click', (e) => {
     let parent = e.target.parentNode.parentNode;
     Array.from(e.target.parentNode.parentNode.classList).find((element) => {
-      if (element !== 'slide-up') {
-        parent.classList.add('slide-up');
+      if (element !== 'slideUp') {
+        parent.classList.add('slideUp');
       } else {
-        signupBtn.parentNode.classList.add('slide-up');
-        parent.classList.remove('slide-up');
+        signupBtn.parentNode.classList.add('slideUp');
+        parent.classList.remove('slideUp');
       }
     });
   });
   signupBtn.addEventListener('click', (e) => {
     let parent = e.target.parentNode;
     Array.from(e.target.parentNode.classList).find((element) => {
-      if (element !== 'slide-up') {
-        parent.classList.add('slide-up');
+      if (element !== 'slideUp') {
+        parent.classList.add('slideUp');
       } else {
-        loginBtn.parentNode.parentNode.classList.add('slide-up');
-        parent.classList.remove('slide-up');
+        loginBtn.parentNode.parentNode.classList.add('slideUp');
+        parent.classList.remove('slideUp');
       }
     });
   });
@@ -41,7 +42,8 @@ export default function Login() {
   const [email, setEmail] = React.useState('');
   const [notice, setNotice] = React.useState(false);
   const { state, dispatch } = React.useContext(UserContext);
-  const GetLogin = () => {
+  const GetLogin = (e) => {
+    e.preventDefault();
     if (
       !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
         email
@@ -76,6 +78,12 @@ export default function Login() {
           history.push('/');
         }
       });
+    // .catch((e) => {
+    //   M.toast({
+    //     html: 'Incorrect',
+    //     classes: '#c62828 red darken-3',
+    //   });
+    // });
   };
   const getRegis = () => {
     if (
@@ -103,13 +111,27 @@ export default function Login() {
       });
       return;
     }
+    if (
+      !validator.isStrongPassword(passwordRegis, {
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1,
+        minSymbols: 1,
+      })
+    ) {
+      M.toast({
+        html: 'Password must contain at least one lower-case letter, one upper-case letter, one digit and a special character',
+        classes: '#c62828 red darken-3',
+      });
+      return;
+    }
     fetch('/signup', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        name: nameRegis,
+        name: nameRegis.toLowerCase(),
         email: emailRegis,
         password: passwordRegis,
       }),
@@ -125,103 +147,117 @@ export default function Login() {
       });
   };
   return (
-    <div className='form-structor'>
-      <div className='signup slide-up'>
-        <h2 className='form-title' id='signup' onClick={(e) => move()}>
-          <span>OR</span>Sign up
-        </h2>
-        <div className='form-holder'>
-          <input
-            type='text'
-            className='input'
-            placeholder='Name'
-            value={nameRegis}
-            onChange={(e) => setNameRegis(e.target.value)}
-          />
-          <input
-            type='email'
-            className='input'
-            placeholder='Email'
-            value={emailRegis}
-            onChange={(e) => setEmailRegis(e.target.value)}
-          />
-          <input
-            type='password'
-            className='input'
-            placeholder='Password'
-            value={passwordRegis}
-            onChange={(e) => {
-              setPasswordRegis(e.target.value);
-            }}
-            onMouseEnter={(e) => setNotice(true)}
-            onMouseLeave={(e) => setNotice(false)}
-          />
-          {notice ? (
-            <span className='popuptext'>
-              At least 8-19 characters, must contain at least one lower-case
-              letter, one upper-case letter, one digit and a special character
-            </span>
-          ) : null}
-          {/* {console.log(noticePass)} */}
-          <input
-            type='password'
-            className='input'
-            placeholder='Confirm Password'
-            value={confirmRegis}
-            onChange={(e) => {
-              setConfirmRegis(e.target.value);
-            }}
-          />
-        </div>
-        <button
-          className={
-            emailRegis && nameRegis && passwordRegis && confirmRegis
-              ? 'submit-btn'
-              : 'submit-btn-disable'
-          }
-          disabled={
-            !emailRegis && !nameRegis && !passwordRegis && !confirmRegis
-          }
-          onClick={() => getRegis()}
-        >
-          Sign up
-        </button>
-      </div>
-
-      <div className='login'>
-        <div className='center'>
-          <h2 className='form-title' id='login' onClick={(e) => move()}>
-            <span>OR</span>Log in
+    <>
+      <div className='formStructor'>
+        <div className='signup slideUp'>
+          <h2 className='formTitle' id='signup' onClick={(e) => move()}>
+            <span>OR</span>Sign up
           </h2>
-          <div className='form-holder'>
-            <input
-              type='email'
-              className='input'
-              placeholder='Email'
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              type='password'
-              className='input'
-              placeholder='Password'
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <button className='submit-btn' onClick={() => GetLogin()}>
-            Log in
-          </button>
-          <div className='line'>
-            <h3>
-              <span>OR</span>
-            </h3>
-          </div>
-          <div className='forgot'>
-            <h2>Forgot password?</h2>
+          <form>
+            <div className='formHolder'>
+              <input
+                type='text'
+                className='input'
+                placeholder='Name'
+                value={nameRegis}
+                onChange={(e) => setNameRegis(e.target.value)}
+              />
+              <input
+                type='text'
+                className='input'
+                placeholder='Email'
+                value={emailRegis}
+                onChange={(e) => setEmailRegis(e.target.value)}
+              />
+              <input
+                type='password'
+                className='input'
+                placeholder='Password'
+                value={passwordRegis}
+                onChange={(e) => {
+                  setPasswordRegis(e.target.value);
+                }}
+                onMouseEnter={(e) => setNotice(true)}
+                onMouseLeave={(e) => setNotice(false)}
+              />
+              {notice ? (
+                <span className='popuptext'>
+                  At least 8-19 characters, must contain at least one lower-case
+                  letter, one upper-case letter, one digit and a special
+                  character
+                </span>
+              ) : null}
+              {/* {console.log(noticePass)} */}
+              <input
+                type='password'
+                className='input'
+                placeholder='Confirm Password'
+                value={confirmRegis}
+                onChange={(e) => {
+                  setConfirmRegis(e.target.value);
+                }}
+              />
+            </div>
+            <button
+              className={
+                emailRegis && nameRegis && passwordRegis && confirmRegis
+                  ? 'submitBtn'
+                  : 'submitBtnDisable'
+              }
+              disabled={
+                !emailRegis && !nameRegis && !passwordRegis && !confirmRegis
+              }
+              onClick={() => getRegis()}
+            >
+              Sign up
+            </button>
+          </form>
+        </div>
+
+        <div className='login'>
+          <div className='center'>
+            <h2 className='formTitle' id='login' onClick={(e) => move()}>
+              <span>OR</span>Log in
+            </h2>
+            <form>
+              <div className='formHolder'>
+                <input
+                  type='text'
+                  className='input'
+                  placeholder='Email'
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <input
+                  type='password'
+                  className='input'
+                  placeholder='Password'
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <button
+                type='submit'
+                className='submitBtn'
+                onClick={(e) => {
+                  GetLogin(e);
+                  setPassword('');
+                }}
+              >
+                Log in
+              </button>
+            </form>
+            <div className='line'>
+              <h3>
+                <span>OR</span>
+              </h3>
+            </div>
+            <div href='/forgotin' className='forgot'>
+              <h2>Forgot password?</h2>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

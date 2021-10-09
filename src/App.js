@@ -6,6 +6,7 @@ import Home from './components/screens/Home';
 import Login from './components/screens/Login';
 import Profile from './components/screens/Profile';
 import Signup from './components/screens/Signup';
+import Forgot from './components/screens/Forgot';
 import CreatePost from './components/screens/CreatePost';
 import { reducer, initialState } from './reducers/userReducers';
 export const UserContext = React.createContext();
@@ -15,7 +16,6 @@ const Routing = () => {
   const { state, dispatch } = React.useContext(UserContext);
   React.useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
-
     if (user) {
       dispatch({ type: 'USER', payload: user });
       history.push('/');
@@ -40,6 +40,9 @@ const Routing = () => {
       </Route>
       <Route path='/create'>
         <CreatePost />
+      </Route>
+      <Route path='/forgot'>
+        <Forgot />
       </Route>
     </Switch>
   );
