@@ -1,23 +1,23 @@
-const validator = require('validator');
-const express = require('express');
+const validator = require("validator");
+const express = require("express");
 const router = express.Router();
-const mongoose = require('mongoose');
-const User = mongoose.model('User');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../keys');
-const requireLogin = require('../middleware/requireLogin');
-const mailer = require('nodemailer');
-router.get('/', (req, res) => {
-  res.send('hello');
+const mongoose = require("mongoose");
+const User = mongoose.model("User");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../keys");
+const requireLogin = require("../middleware/requireLogin");
+const mailer = require("nodemailer");
+router.get("/", (req, res) => {
+  res.send("hello");
 });
 
 // check password
-router.post('/signup', (req, res) => {
+router.post("/signup", (req, res) => {
   const { name, email, password } = req.body;
 
   if (!email || !password || !name) {
-    return res.status(422).json({ error: 'Please input all fields' });
+    return res.status(422).json({ error: "Please input all fields" });
   }
   if (
     !validator.isStrongPassword(req.body.password, {
@@ -29,14 +29,14 @@ router.post('/signup', (req, res) => {
   ) {
     return res.status(422).json({
       error:
-        'Password must contain at least one lower-case letter, one upper-case letter, one digit and a special character',
+        "Password must contain at least one lower-case letter, one upper-case letter, one digit and a special character",
     });
   }
 
   User.findOne({ email: email, name: name })
     .then((savedUser) => {
       if (savedUser) {
-        return res.status(422).json({ error: 'User already exists' });
+        return res.status(422).json({ error: "User already exists" });
       }
       bcrypt.hash(password, 12).then((hashedPass) => {
         const user = new User({
@@ -55,7 +55,7 @@ router.post('/signup', (req, res) => {
         user
           .save()
           .then((user) => {
-            res.json({ message: 'User Added', user: user });
+            res.json({ message: "User Added", user: user });
           })
           .catch((err) => {
             console.log(err);
@@ -68,18 +68,18 @@ router.post('/signup', (req, res) => {
     });
 });
 
-router.post('/login', (req, res) => {
+router.post("/login", (req, res) => {
   const { email, password } = req.body;
   console.log(email, password);
   if (!email || !password) {
-    return res.status(422).json({ error: 'Please enter email or password' });
+    return res.status(422).json({ error: "Please enter email or password" });
   }
 
   User.findOne({ email: email })
     .then((savedUser) => {
-      console.log('saveUser:', savedUser.checkLogin);
+      console.log("saveUser:", savedUser.checkLogin);
       if (!savedUser) {
-        return res.status(422).json({ error: 'Email not found' });
+        return res.status(422).json({ error: "Email not found" });
       }
 
       if (new Date().getTime() < savedUser.checkLogin.delayTime) {
@@ -96,13 +96,13 @@ router.post('/login', (req, res) => {
 
       bcrypt.compare(password, savedUser.password).then(async (doMatch) => {
         if (doMatch) {
-          console.log('loginSUccess');
+          console.log("loginSUccess");
           // res.json({ message: 'Signin Successfully' });
           const token = jwt.sign({ _id: savedUser._id }, JWT_SECRET);
           const { _id, name, email, checkLogin, expirePasswordDate } =
             savedUser;
           const resp = {
-            message: 'Successfully Login',
+            message: "Successfully Login",
             user: { _id, name, email, expirePasswordDate },
             token: token,
           };
@@ -119,7 +119,7 @@ router.post('/login', (req, res) => {
               if (err) {
                 console.log(err);
               } else {
-                console.log('Success Login', result);
+                console.log("Success Login", result);
               }
             }
           );
@@ -129,20 +129,20 @@ router.post('/login', (req, res) => {
             // send email to path
             // --------------------------------- send email to path
             var smtp = {
-              host: 'smtp.gmail.com', //set to your host name or ip
+              host: "smtp.gmail.com", //set to your host name or ip
               port: 587, //25, 465, 587 depend on your
               secure: false, // use SSL
               auth: {
-                user: 'phakawat.ta@ku.th', //user account
-                pass: '@MilkShake77', //user password
+                user: "phakawat.ta@ku.th", //user account
+                pass: "@MilkShake77", //user password
               },
             };
             var smtpTransport = mailer.createTransport(smtp);
 
             var mail = {
-              from: 'no-reply@kaidow.th', //from email (option)
+              from: "no-reply@kaidow.th", //from email (option)
               to: `${savedUser.email}`, //to email (require)
-              subject: `${'Reset Password - KDStory'}`, //subject
+              subject: `${"Reset Password - KDStory"}`, //subject
               html: `<div><h1>Click on the link below to reset your password </h1> <strong><a href = "http://localhost:3000/forgot/${expirePasswordDate}"> HERE </a></strong></div>`, //email body
             };
 
@@ -150,17 +150,17 @@ router.post('/login', (req, res) => {
               smtpTransport.close();
               if (err) {
                 //error handler
-                console.log(err);
+                conole.log(err);
               } else {
                 //success handler
-                console.log('send email success', response);
+                console.log("send email success", response);
               }
             });
 
             // --------------------------------- send email to path
 
             res.json({
-              error: 'You password is expired plese check your email',
+              error: "You password is expired plese check your email",
             });
           } else {
             res.json(resp);
@@ -168,29 +168,10 @@ router.post('/login', (req, res) => {
 
           // check expire password 3 time
         } else {
-          // let lastCount = 0;
-          User.findByIdAndUpdate(
-            savedUser._id,
-            {
-              checkLogin: {
-                count: savedUser.checkLogin.count + 1,
-                delayTime: new Date().getTime(),
-              },
-            },
-            { new: true },
-            (err, result) => {
-              // lastCount = result.checkLogin.count;
+          let lastCount = 1;
 
-              if (err) {
-                console.log(err);
-              } else {
-                console.log('plus count', result);
-              }
-            }
-          );
-
-          if (savedUser.checkLogin.count === 3) {
-            User.findByIdAndUpdate(
+          if (savedUser.checkLogin.count >= 3) {
+            await User.findByIdAndUpdate(
               savedUser._id,
               {
                 checkLogin: {
@@ -198,41 +179,56 @@ router.post('/login', (req, res) => {
                   delayTime: new Date().getTime() + 5 * 60 * 1000,
                 },
               },
-              { new: true },
-              (err, result) => {
-                if (err) {
-                  console.log(err);
-                } else {
-                  console.log('plus 5 min', result);
-                }
+              { new: true }
+            ).then((err, result) => {
+              if (err) {
+                console.log(err);
               }
-            );
+            });
+
             return res
               .status(422)
-              .json({ error: 'Wrong password 4 time.Please wait for 5 min' });
+              .json({ error: "Wrong password 4 time.Please wait for 5 min" });
+          } else {
+            await User.findByIdAndUpdate(
+              savedUser._id,
+              {
+                checkLogin: {
+                  count: savedUser.checkLogin.count + 1,
+                  delayTime: new Date().getTime(),
+                },
+              },
+              { new: true }
+            ).then((res, err) => {
+              if (err) {
+                console.log("err", err);
+              } else {
+                lastCount = res.checkLogin.count;
+              }
+            });
           }
-          console.log(savedUser);
+
           return res.status(422).json({
-            error: `Username or Password Incorrect`,
+            error: `Username or Password ${lastCount}/4`,
           });
         }
       });
     })
     .catch((err) => {
       console.log(err);
-      return res.status(400).json({ error: 'EMAIL OR PASSWORD INCORRECT' });
+      return res.status(400).json({ error: "EMAIL OR PASSWORD INCORRECT" });
     });
 });
 
-router.put('/setPassword', (req, res) => {
+router.put("/setPassword", (req, res) => {
   const { expirePasswordDate, password } = req.body;
-  console.log('set new = ', { expirePasswordDate, password });
+  console.log("set new = ", { expirePasswordDate, password });
   User.findOne({ expirePasswordDate: req.body.expirePasswordDate })
     .then((savedUser) => {
-      console.log('sav = ', savedUser);
+      console.log("sav = ", savedUser);
       if (savedUser) {
         let _id = savedUser._id;
-        console.log('id = ', _id);
+        console.log("id = ", _id);
         bcrypt.hash(password, 12).then((hashedPass) => {
           User.findByIdAndUpdate(
             _id,
@@ -244,12 +240,12 @@ router.put('/setPassword', (req, res) => {
             },
             { new: true }
           ).then((dat) => {
-            console.log('success');
+            console.log("success");
           });
         });
       }
 
-      res.json({ success: 'yah' });
+      res.json({ success: "yah" });
 
       // set new password
       // console.log('saveUser:', savedUser.checkLogin);
