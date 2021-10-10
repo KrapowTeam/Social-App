@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { UserContext } from '../../App';
 import '../styles/Login.css';
 import { Link, useHistory } from 'react-router-dom';
@@ -6,7 +6,7 @@ import M from 'materialize-css';
 import validator from 'validator';
 
 function move() {
-  console.clear();
+  // console.clear();
   const loginBtn = document.getElementById('login');
   const signupBtn = document.getElementById('signup');
   loginBtn.addEventListener('click', (e) => {
@@ -41,7 +41,66 @@ export default function Login() {
   const [password, setPassword] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [notice, setNotice] = React.useState(false);
+  const [check, setCheck] = React.useState(false);
   const { state, dispatch } = React.useContext(UserContext);
+  const [stateSlide, setStateSlide] = React.useState('signup');
+
+  useEffect(() => {
+    if (passwordRegis === confirmRegis) {
+      setCheck(true);
+    } else {
+      setCheck(false);
+    }
+  }, [confirmRegis]);
+
+  useEffect(() => {
+    const loginBtn = document.getElementById('login');
+    const signupBtn = document.getElementById('signup');
+    loginBtn.addEventListener('click', (e) => {
+      // if (stateSlide === 'login') {
+
+      console.log('state = ', stateSlide);
+      let parent = e.target.parentNode.parentNode;
+      Array.from(e.target.parentNode.parentNode.classList).find((element) => {
+        if (element !== 'slideUp') {
+          if (stateSlide === 'signUp') {
+            parent.classList.add('slideUp');
+            setStateSlide('login');
+          }
+          // else {
+          //   setStateSlide('signUp');
+          // }
+        } else {
+          signupBtn.parentNode.classList.add('slideUp');
+          parent.classList.remove('slideUp');
+        }
+      });
+      //   setStateSlide('login');
+      // }
+    });
+    signupBtn.addEventListener('click', (e) => {
+      // if (stateSlide === 'signUp') {
+      console.log('state = ', stateSlide);
+      let parent = e.target.parentNode;
+      Array.from(e.target.parentNode.classList).find((element) => {
+        if (element !== 'slideUp') {
+          if (stateSlide === 'login') {
+            parent.classList.add('slideUp');
+            setStateSlide('signUp');
+          }
+          // else {
+          //   setStateSlide('login');
+          // }
+        } else {
+          loginBtn.parentNode.parentNode.classList.add('slideUp');
+          parent.classList.remove('slideUp');
+        }
+      });
+      //   setStateSlide('signUp');
+      // }
+    });
+  }, []);
+
   const GetLogin = (e) => {
     e.preventDefault();
     if (
@@ -70,7 +129,7 @@ export default function Login() {
         if (data.error) {
           M.toast({ html: data.error, classes: '#c62828 red darken-3' });
         } else {
-          console.log(data);
+          console.log('login data', data);
           localStorage.setItem('jwt', data.token);
           localStorage.setItem('user', JSON.stringify(data.user));
           dispatch({ type: 'USER', payload: data.user });
@@ -85,7 +144,22 @@ export default function Login() {
     //   });
     // });
   };
-  const getRegis = () => {
+  const getRegis = (e) => {
+    e.preventDefault();
+    if (/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(nameRegis)) {
+      M.toast({
+        html: 'username must have not special character',
+        classes: '#c62828 red darken-3',
+      });
+      return;
+    }
+    if (nameRegis.indexOf(' ') >= 0) {
+      M.toast({
+        html: 'username must have not space',
+        classes: '#c62828 red darken-3',
+      });
+      return;
+    }
     if (
       !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
         emailRegis
@@ -150,7 +224,7 @@ export default function Login() {
     <>
       <div className='formStructor'>
         <div className='signup slideUp'>
-          <h2 className='formTitle' id='signup' onClick={(e) => move()}>
+          <h2 className='formTitle' id='signup'>
             <span>OR</span>Sign up
           </h2>
           <form>
@@ -198,6 +272,19 @@ export default function Login() {
                 }}
               />
             </div>
+            {!check && confirmRegis !== '' ? (
+              <p
+                style={{
+                  color: 'red',
+                  background: 'white',
+                  textAlign: 'center',
+                  fontSize: '12px',
+                }}
+              >
+                Password not matched
+              </p>
+            ) : null}
+
             <button
               className={
                 emailRegis && nameRegis && passwordRegis && confirmRegis
@@ -207,7 +294,7 @@ export default function Login() {
               disabled={
                 !emailRegis && !nameRegis && !passwordRegis && !confirmRegis
               }
-              onClick={() => getRegis()}
+              onClick={(e) => getRegis(e)}
             >
               Sign up
             </button>
@@ -216,7 +303,7 @@ export default function Login() {
 
         <div className='login'>
           <div className='center'>
-            <h2 className='formTitle' id='login' onClick={(e) => move()}>
+            <h2 className='formTitle' id='login'>
               <span>OR</span>Log in
             </h2>
             <form>
@@ -252,8 +339,8 @@ export default function Login() {
                 <span>OR</span>
               </h3>
             </div>
-            <div href='/forgotin' className='forgot'>
-              <h2>Forgot password?</h2>
+            <div className='forgot'>
+              <a href='/forgotpassword'>Forgot password?</a>
             </div>
           </div>
         </div>

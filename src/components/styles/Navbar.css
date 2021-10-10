@@ -1,6 +1,5 @@
 .logo {
   width: 40px;
-  margin-top: 14px;
   margin-left: 20px;
 }
 
@@ -8,8 +7,6 @@
   width: 16px;
   height: 16px;
   margin: 10px;
-  margin-bottom: -5px;
-  margin-top: 23px;
 }
 .nav-wrapper {
   background-color: #ffd145;

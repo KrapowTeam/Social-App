@@ -8,10 +8,27 @@ import post from '../assets/add.png';
 import logout from '../assets/logout.png';
 import './styles/Navbar.css';
 import { UserContext } from '../App';
+import { faUser, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function Navbar() {
   const { state, dispatch } = React.useContext(UserContext);
   const history = useHistory();
+
+  const logout = () => {
+    // let now = new Date();
+    fetch('/logout', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: state.email,
+        event: 'logout',
+      }),
+    });
+  };
+
   return state ? (
     <nav>
       <div className='nav-wrapper'>
@@ -41,15 +58,39 @@ export default function Navbar() {
               <img src={post} className='icon' alt='postIcon' />
             </Link>
           </li>
+
+          {
+            <li>
+              <Link to='/admin'>
+                {/* <img src={admin} className='icon' alt='adminIcon' /> */}
+                <FontAwesomeIcon
+                  className='icon'
+                  style={{ marginTop: '24px', marginBottom: '-2px' }}
+                  icon={faUser}
+                  color='white'
+                />
+              </Link>
+            </li>
+          }
+
           <li>
             <Link
               to='/Login'
               onClick={() => {
                 localStorage.clear();
                 dispatch({ type: 'CLEAR' });
+                logout();
               }}
             >
-              <img src={logout} className='icon' alt='logout' />
+              <FontAwesomeIcon
+                className='icon'
+                style={{
+                  marginTop: '21px',
+                  marginBottom: '-3px',
+                }}
+                icon={faSignOutAlt}
+                color='white'
+              />
             </Link>
           </li>
         </ul>

@@ -7,22 +7,27 @@ import Login from './components/screens/Login';
 import Profile from './components/screens/Profile';
 import Signup from './components/screens/Signup';
 import Forgot from './components/screens/Forgot';
+import Admin from './components/screens/Admin';
+import Otp from './components/screens/Otp';
+import Forgotin from './components/screens/Forgotin';
 import CreatePost from './components/screens/CreatePost';
+import UserProfile from './components/screens/UserProfile';
 import { reducer, initialState } from './reducers/userReducers';
 export const UserContext = React.createContext();
 
 const Routing = () => {
   const history = useHistory();
   const { state, dispatch } = React.useContext(UserContext);
-  React.useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      dispatch({ type: 'USER', payload: user });
-      history.push('/');
-    } else {
-      history.push('/Login');
-    }
-  }, []);
+  // React.useEffect(() => {
+  //   const user = JSON.parse(localStorage.getItem('user'));
+  //   console.log('user in store', user);
+  //   if (user) {
+  //     dispatch({ type: 'USER', payload: user });
+  //     history.push('/');
+  //   } else {
+  //     history.push('/Login');
+  //   }
+  // }, []);
 
   return (
     <Switch>
@@ -35,6 +40,9 @@ const Routing = () => {
       <Route path='/login'>
         <Login />
       </Route>
+      <Route path='/profile/:userid'>
+        <UserProfile />
+      </Route>
       <Route path='/profile'>
         <Profile />
       </Route>
@@ -43,6 +51,16 @@ const Routing = () => {
       </Route>
       <Route path='/forgot'>
         <Forgot />
+      </Route>
+      <Route path='/forgotpassword'>
+        <Forgotin />
+      </Route>
+      <Route path='/admin'>
+        <Admin />
+      </Route>
+
+      <Route path='/otp'>
+        <Otp />
       </Route>
     </Switch>
   );

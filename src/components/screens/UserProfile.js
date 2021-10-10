@@ -3,28 +3,33 @@ import '../styles/Profile.css';
 import { faHeart, faCog, faComment } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UserContext } from '../../App';
+import { useParams } from 'react-router-dom';
 
 export default function Profile() {
-  const [mypics, setPics] = useState([]);
+  const [userProfile, setProfile] = useState(null);
   const { state, dispatch } = useContext(UserContext);
+  const { userid } = useParams();
 
   useEffect(() => {
-    fetch('/myposts', {
-      method: 'get',
+    fetch(`/user/${userid}`, {
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('jwt'),
       },
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log(result.mypost);
-        setPics(result.mypost);
+        console.log(result);
+        console.log(userid);
+        setProfile(result);
+      })
+      .catch((e) => {
+        console.log('error ', e);
       });
   }, []);
 
   return (
     <>
-      {state ? (
+      {userProfile ? (
         <div className='all'>
           <div className='container'>
             <div className='profile'>
@@ -37,7 +42,7 @@ export default function Profile() {
               </div>
 
               <div className='profile-user-settings'>
-                <h1 className='profile-user-name'>{state.name}</h1>
+                <h1 className='profile-user-name'>{userProfile.user.name}</h1>
 
                 <button className='btnp profile-edit-btnp'>Edit Profile</button>
 
@@ -55,7 +60,9 @@ export default function Profile() {
               <div className='profile-stats'>
                 <ul>
                   <li>
-                    <span className='profile-stat-count'>{mypics.length} </span>{' '}
+                    <span className='profile-stat-count'>
+                      {userProfile.posts.length}{' '}
+                    </span>
                     posts
                   </li>
                   <li>
@@ -77,7 +84,7 @@ export default function Profile() {
           </div>
           <div className='container'>
             <div className='gallery'>
-              {mypics.map((item) => (
+              {userProfile.posts.map((item) => (
                 <div className='gallery-item' tabindex='0'>
                   <img
                     className='pimg'

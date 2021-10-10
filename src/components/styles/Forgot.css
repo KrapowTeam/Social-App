@@ -1,0 +1,29 @@
+.home {
+}
+
+.switch.showhide {
+  display: flex;
+  justify-content: center;
+}
+
+.switch.showhide label {
+  font-size: 18px;
+}
+
+.forgot-card {
+  max-width: 500px;
+  height: max-content;
+  margin: 26px auto;
+  background-image: url('https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fstatic.onecms.io%2Fwp-content%2Fuploads%2Fsites%2F19%2F2018%2F02%2F13%2Ffield-image-egg-crisp-hero-2000.jpg&q=85');
+  background-position: center;
+  background-size: cover;
+}
+
+.likeIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.resetSubmit:hover {
+  color: white;
+}

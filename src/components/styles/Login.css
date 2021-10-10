@@ -292,11 +292,11 @@
 .forgot {
   text-align: center;
 }
-.forgot h2 {
+.forgot a {
   font-size: 1.5vh;
   cursor: pointer;
 }
-.forgot h2:hover {
+.forgot a:hover {
   color: rgb(41, 73, 143);
 }
 .popuptext {
