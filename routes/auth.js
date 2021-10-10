@@ -70,7 +70,6 @@ router.post("/signup", (req, res) => {
 
 router.post("/login", (req, res) => {
   const { email, password } = req.body;
-  console.log(email, password);
   if (!email || !password) {
     return res.status(422).json({ error: "Please enter email or password" });
   }
@@ -158,7 +157,6 @@ router.post("/login", (req, res) => {
             });
 
             // --------------------------------- send email to path
-
             res.json({
               error: "You password is expired plese check your email",
             });
@@ -220,6 +218,60 @@ router.post("/login", (req, res) => {
     });
 });
 
+const sendResetEmail = ({ email, expirePasswordDate }) => {
+  // new Date().getTime > expirePasswordDate
+  // password expire
+  // send email to path
+  // --------------------------------- send email to path
+  var smtp = {
+    host: "smtp.gmail.com", //set to your host name or ip
+    port: 587, //25, 465, 587 depend on your
+    secure: false, // use SSL
+    auth: {
+      user: "phakawat.ta@ku.th", //user account
+      pass: "@MilkShake77", //user password
+    },
+  };
+  var smtpTransport = mailer.createTransport(smtp);
+
+  var mail = {
+    from: "no-reply@kaidow.th", //from email (option)
+    to: `${email}`, //to email (require)
+    subject: `${"Reset Password"}`, //subject
+    html: `<div><h1>Click on the link below to reset your password </h1> <strong><a href = "http://localhost:3000/forgot/${expirePasswordDate}"> HERE </a></strong></div>`, //email body
+  };
+
+  smtpTransport.sendMail(mail, function (err, response) {
+    smtpTransport.close();
+    if (err) {
+      //error handler
+      conole.log(err);
+    } else {
+      //success handler
+      console.log("send email success", response);
+    }
+  });
+};
+
+// --------------forgotpassword -------------------//
+
+router.post("/forgotpassword", (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(422).json({ error: "Please enter email" });
+  }
+
+  User.findOne({ email: email }).then((user) => {
+    if (!user) {
+      return res.status(422).json({ error: "Email not found" });
+    } else {
+      console.log("saveUser:", email);
+      sendResetEmail(user);
+    }
+  });
+});
+
+// -------------- send email to path-------------------//
 router.put("/setPassword", (req, res) => {
   const { expirePasswordDate, password } = req.body;
   console.log("set new = ", { expirePasswordDate, password });
@@ -239,7 +291,7 @@ router.put("/setPassword", (req, res) => {
               ),
             },
             { new: true }
-          ).then((dat) => {
+          ).then((data) => {
             console.log("success");
           });
         });
