@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  checkOTP: {
+    otp: { type: String, default: '' },
+    expireTime: { Number, default: 0 },
+  },
 });
 
 mongoose.model('User', userSchema);

@@ -19,11 +19,15 @@ mongoose.connection.on('error', (err) => {
 
 require('./models/user');
 require('./models/post');
+require('./models/log');
+
 // phakawat
 // GjNQyvBuz2Fwyd81
 app.use(express.json());
 app.use(require('./routes/auth'));
 app.use(require('./routes/post'));
+app.use(require('./routes/log'));
+app.use(require('./routes/user'));
 
 app.listen(PORT, () => {
   console.log('server is running on port:', PORT);
