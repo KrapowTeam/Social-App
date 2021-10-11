@@ -12,7 +12,7 @@ function Forgot(props) {
   const expDate = useRef('');
   const history = useHistory();
   useEffect(() => {
-    console.log(props.location.pathname.split('/forgot/'));
+    // console.log(props.location.pathname.split('/forgot/'));
     expDate.current =
       props.location.pathname.split('/forgot')[
         props.location.pathname.split('/forgot').length - 1
@@ -102,11 +102,13 @@ function Forgot(props) {
     }
   };
   return (
-    <div className='card forgot-card'>
-      <div className='card-content'>
-        <div>
-          <h4>Change your password</h4>
-          <form>
+    <div className='card-forgot'>
+      <div className='addDetail'>
+        <div className='formTitle'>
+          <h2>Change your password</h2>
+        </div>
+        <form>
+          <div className='formHolder'>
             <input
               type='password'
               // className={styles.input}
@@ -125,28 +127,31 @@ function Forgot(props) {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
-            <div className='switch showhide'>
-              <label>
-                Hide
-                <input type='checkbox' />
-                <span className='lever' onClick={() => toggleShow()} />
-                Show
-              </label>
-            </div>
-            {/* <button onClick={() => handleSubmit()}>click</button> */}
-            <button
-              onClick={(e) => {
-                handleSubmit(e);
-                setPassword('');
-                setConfirmPassword('');
-              }}
-              type='submit'
-              className='waves-effect waves-light btn resetSubmit'
-            >
-              submit
-            </button>
-          </form>
-        </div>
+          </div>
+          <div className='switch showhide'>
+            <label>
+              Hide
+              <input type='checkbox' />
+              <span className='lever' onClick={() => toggleShow()} />
+              Show
+            </label>
+          </div>
+          {/* <button onClick={() => handleSubmit()}>click</button> */}
+          <button
+            onClick={(e) => {
+              handleSubmit(e);
+              setPassword('');
+              setConfirmPassword('');
+            }}
+            type='submit'
+            className={
+              password && confirmPassword ? 'submitBtn' : 'submitBtnDisable'
+            }
+            disabled={!password && !confirmPassword}
+          >
+            Submit
+          </button>
+        </form>{' '}
       </div>
     </div>
   );

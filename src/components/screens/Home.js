@@ -26,6 +26,7 @@ export default function Home() {
       });
   }, []);
   const likePost = (id) => {
+    // e.preventDefault();
     fetch('/like', {
       method: 'put',
       headers: {
@@ -38,14 +39,15 @@ export default function Home() {
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log('like');
         const newData = data.map((item) => {
           if (item._id == result._id) {
+            console.log('like :', result);
             return result;
           } else {
             return item;
           }
         });
+        console.log('data on like ', newData);
         setData(newData);
       })
       .catch((err) => {
@@ -77,9 +79,9 @@ export default function Home() {
       });
   };
   const makeComment = (text, postId) => {
-    if (document.getElementById('addsomecomment').value == '') {
+    if (!text) {
       M.toast({
-        html: 'Please add comment',
+        html: 'Comment must not empty',
         classes: '#c62828 red darken-3',
       });
       return;
@@ -99,17 +101,20 @@ export default function Home() {
       .then((result) => {
         const newData = data.map((item) => {
           if (item._id == result._id) {
+            console.log('comment : ', result);
+            document.getElementById(item._id).value = ''; // {item._id}
             return result;
           } else {
             return item;
           }
         });
+        console.log('Data comment ', newData);
         setData(newData);
+        // document.getElementById('addsomecomment').value = ''; // {item._id}
         M.toast({
           html: 'Successfully Commented',
           classes: '#c62828 green darken-3',
         });
-        document.getElementById('addsomecomment').value = '';
       })
       .catch((err) => {
         console.log(err);
@@ -133,6 +138,7 @@ export default function Home() {
   };
   return (
     <div className='home'>
+      {console.log(state)}
       {data.map((item) => {
         return (
           <>
@@ -170,26 +176,41 @@ export default function Home() {
                     />
                   )}
                   <h6 style={{ marginTop: '5px' }}>
-                    {item.likes.length} likes
+                    {item.likes.length}{' '}
+                    {item.likes.length == 1 || item.likes.length == 0
+                      ? 'like'
+                      : 'likes'}
                   </h6>
                 </div>
-                <h6 style={{ cursor: 'pointer' }}>
-                  <Link
-                    to={
-                      item.postedBy._id !== state._id
-                        ? '/profile/' + item.postedBy._id
-                        : '/profile'
-                    }
-                  >
-                    {item.postedBy.name}
-                  </Link>
-                </h6>
-                <h6>says: {item.title}</h6>
-                <p>{item.body}</p>
+                <div className='postOwner'>
+                  <h6>
+                    <Link
+                      to={
+                        item.postedBy._id !== state._id
+                          ? '/profile/' + item.postedBy._id
+                          : '/profile'
+                      }
+                      style={{
+                        cursor: 'pointer',
+                        fontWeight: '500',
+                      }}
+                    >
+                      {item.postedBy.name}
+                    </Link>
+                    <span className='postBody'> {item.body}</span>
+                  </h6>
+                </div>
+                <hr />
                 {item.comments.map((record) => {
                   return (
                     <h6 key={record._id}>
-                      <span style={{ fontWeight: '500', cursor: 'pointer' }}>
+                      <span
+                        style={{
+                          fontWeight: '500',
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                        }}
+                      >
                         <Link
                           to={
                             record.postedBy._id !== state._id
@@ -200,7 +221,7 @@ export default function Home() {
                           {record.postedBy.name}
                         </Link>
                       </span>{' '}
-                      {record.text}
+                      {'  '} {record.text}
                     </h6>
                   );
                 })}
@@ -212,8 +233,10 @@ export default function Home() {
                 >
                   <input
                     type='text'
-                    id='addsomecomment'
+                    // id='addsomecomment' // {item._id}
+                    id={item._id}
                     placeholder='Add some comment'
+                    autoComplete='off'
                   />
                 </form>
               </div>

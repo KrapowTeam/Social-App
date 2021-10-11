@@ -28,73 +28,77 @@ export default function Navbar() {
       }),
     });
   };
+  // console.log('state = ', state);
+  return (
+    <>
+      {(state ?? '').name && (
+        <nav>
+          <div className='nav-wrapper'>
+            <img src={Logo} className='logo' alt='logoIcon' />
 
-  return state ? (
-    <nav>
-      <div className='nav-wrapper'>
-        <img src={Logo} className='logo' alt='logoIcon' />
-
-        <ul id='nav-mobile' className='right'>
-          <li>
-            <Link to='/'>
-              <img src={Home} className='icon' alt='homeIcon' />
-            </Link>
-          </li>
-          {/* <li>
+            <ul id='nav-mobile' className='right'>
+              <li>
+                <Link to='/'>
+                  <img src={Home} className='icon' alt='homeIcon' />
+                </Link>
+              </li>
+              {/* <li>
             <Link to='/Login'>
               <img src={key} className='icon' alt='loginIcon' />
             </Link>
           </li> */}
-          {/* // <li>
+              {/* // <li>
           //   <Link to='/Signup'>Signup</Link>
           // </li> */}
-          <li>
-            <Link to='/Profile'>
-              <img src={user} className='icon' alt='profileIcon' />
-            </Link>
-          </li>
-          <li>
-            <Link to='/Create'>
-              <img src={post} className='icon' alt='postIcon' />
-            </Link>
-          </li>
+              <li>
+                <Link to='/Profile'>
+                  <img src={user} className='icon' alt='profileIcon' />
+                </Link>
+              </li>
+              <li>
+                <Link to='/Create'>
+                  <img src={post} className='icon' alt='postIcon' />
+                </Link>
+              </li>
 
-          {
-            <li>
-              <Link to='/admin'>
-                {/* <img src={admin} className='icon' alt='adminIcon' /> */}
-                <FontAwesomeIcon
-                  className='icon'
-                  style={{ marginTop: '24px', marginBottom: '-2px' }}
-                  icon={faUser}
-                  color='white'
-                />
-              </Link>
-            </li>
-          }
+              {state.email === 'phakawat.ta@ku.th' ? (
+                <li>
+                  <Link to='/admin'>
+                    {/* <img src={admin} className='icon' alt='adminIcon' /> */}
+                    <FontAwesomeIcon
+                      className='icon'
+                      style={{ marginTop: '24px', marginBottom: '-2px' }}
+                      icon={faUser}
+                      color='white'
+                    />
+                  </Link>
+                </li>
+              ) : null}
 
-          <li>
-            <Link
-              to='/Login'
-              onClick={() => {
-                localStorage.clear();
-                dispatch({ type: 'CLEAR' });
-                logout();
-              }}
-            >
-              <FontAwesomeIcon
-                className='icon'
-                style={{
-                  marginTop: '21px',
-                  marginBottom: '-3px',
-                }}
-                icon={faSignOutAlt}
-                color='white'
-              />
-            </Link>
-          </li>
-        </ul>
-      </div>
-    </nav>
-  ) : null;
+              <li>
+                <Link
+                  to='/Login'
+                  onClick={() => {
+                    localStorage.clear();
+                    dispatch({ type: 'CLEAR' });
+                    logout();
+                  }}
+                >
+                  <FontAwesomeIcon
+                    className='icon'
+                    style={{
+                      marginTop: '21px',
+                      marginBottom: '-3px',
+                    }}
+                    icon={faSignOutAlt}
+                    color='white'
+                  />
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      )}
+    </>
+  );
 }

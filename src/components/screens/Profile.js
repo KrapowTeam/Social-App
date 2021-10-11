@@ -6,7 +6,9 @@ import { UserContext } from '../../App';
 
 export default function Profile() {
   const [mypics, setPics] = useState([]);
+
   const { state, dispatch } = useContext(UserContext);
+  const [image, setImage] = useState('');
 
   useEffect(() => {
     fetch('/myposts', {
@@ -21,7 +23,45 @@ export default function Profile() {
         setPics(result.mypost);
       });
   }, []);
-
+  useEffect(() => {
+    if (image) {
+      const data = new FormData();
+      data.append('file', image);
+      data.append('upload_preset', 'insta-clone');
+      data.append('cloud_name', 'cnq');
+      fetch('https://api.cloudinary.com/v1_1/cnq/image/upload', {
+        method: 'post',
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          fetch('/updatepic', {
+            method: 'put',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + localStorage.getItem('jwt'),
+            },
+            body: JSON.stringify({
+              pic: data.url,
+            }),
+          })
+            .then((res) => res.json())
+            .then((result) => {
+              localStorage.setItem(
+                'user',
+                JSON.stringify({ ...state, pic: result.pic })
+              );
+              dispatch({ type: 'UPDATEPIC', payload: result.pic });
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [image]);
+  const updatePhoto = (file) => {
+    setImage(file);
+  };
   return (
     <>
       {state ? (
@@ -29,11 +69,7 @@ export default function Profile() {
           <div className='container'>
             <div className='profile'>
               <div className='profile-image'>
-                <img
-                  className='pimg'
-                  src='https://static.wikia.nocookie.net/adf25491-c481-48c6-bec5-0586ba019662'
-                  alt=''
-                />
+                <img className='pimg' src={state.pic} alt='profileIMG' />
               </div>
 
               <div className='profile-user-settings'>
@@ -73,6 +109,21 @@ export default function Profile() {
                   Investor
                 </p>
               </div>
+              {/* <div
+                className='file-field input-field'
+                style={{ margin: '10px' }}
+              >
+                <div className='btn #64b5f6 blue darken-1'>
+                  <span>Upload pic</span>
+                  <input
+                    type='file'
+                    onChange={(e) => updatePhoto(e.target.files[0])}
+                  />
+                </div>
+                <div className='file-path-wrapper'>
+                  <input className='file-path valiadate' type='text' />
+                </div>
+              </div> */}
             </div>
           </div>
           <div className='container'>

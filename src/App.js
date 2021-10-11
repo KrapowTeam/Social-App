@@ -1,7 +1,14 @@
 import React from 'react';
 import Navbar from './components/Navbar';
 import './App.css';
-import { BrowserRouter, Route, Switch, useHistory } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Route,
+  Switch,
+  useHistory,
+  useLocation,
+  useParams,
+} from 'react-router-dom';
 import Home from './components/screens/Home';
 import Login from './components/screens/Login';
 import Profile from './components/screens/Profile';
@@ -17,56 +24,77 @@ export const UserContext = React.createContext();
 
 const Routing = () => {
   const history = useHistory();
+  const location = useLocation();
+
   const { state, dispatch } = React.useContext(UserContext);
-  // React.useEffect(() => {
-  //   const user = JSON.parse(localStorage.getItem('user'));
-  //   console.log('user in store', user);
-  //   if (user) {
-  //     dispatch({ type: 'USER', payload: user });
-  //     history.push('/');
-  //   } else {
-  //     history.push('/Login');
-  //   }
-  // }, []);
+  React.useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    console.log('user in store', user);
+    if (user) {
+      dispatch({ type: 'USER', payload: user });
+      if (location.pathname === '/Login') {
+        history.push('/');
+      }
+      if (location.pathname === '/forgotpassword') {
+        history.push('/');
+      }
+      if (location.pathname === '/otp') {
+        history.push('/');
+      }
+
+      // history.push('/');
+    } else {
+      console.log(location);
+      if (location.pathname === '/forgotpassword') {
+        history.push('/forgotpassword');
+      } else {
+        history.push('/Login');
+      }
+      // history.push('/Login');
+    }
+  }, []);
 
   return (
-    <Switch>
-      <Route exact path='/'>
-        <Home />
-      </Route>
-      <Route path='/signup'>
-        <Signup />
-      </Route>
-      <Route path='/login'>
-        <Login />
-      </Route>
-      <Route path='/profile/:userid'>
-        <UserProfile />
-      </Route>
-      <Route path='/profile'>
-        <Profile />
-      </Route>
-      <Route path='/create'>
-        <CreatePost />
-      </Route>
-      <Route path='/forgot'>
-        <Forgot />
-      </Route>
+    <>
+      <Switch>
+        <Route exact path='/'>
+          <Home />
+        </Route>
+        <Route path='/signup'>
+          <Signup />
+        </Route>
+        <Route path='/login'>
+          <Login />
+        </Route>
+        <Route path='/profile/:userid'>
+          <UserProfile />
+        </Route>
+        <Route path='/profile'>
+          <Profile />
+        </Route>
+        <Route path='/create'>
+          <CreatePost />
+        </Route>
+        <Route path='/forgot'>
+          <Forgot />
+        </Route>
+
+        <Route path='/admin'>
+          <Admin />
+        </Route>
+
+        <Route path='/otp'>
+          <Otp />
+        </Route>
+      </Switch>
       <Route path='/forgotpassword'>
         <Forgotin />
       </Route>
-      <Route path='/admin'>
-        <Admin />
-      </Route>
-
-      <Route path='/otp'>
-        <Otp />
-      </Route>
-    </Switch>
+    </>
   );
 };
 
-function App() {
+function App(props) {
   const [state, dispatch] = React.useReducer(reducer, initialState);
   return (
     <UserContext.Provider value={{ state, dispatch }}>

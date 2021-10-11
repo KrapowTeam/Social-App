@@ -11,4 +11,18 @@
   width: 16px;
   height: 16px;
   cursor: pointer;
+  margin: 1.2vh;
+  margin-top: 0;
+  margin-left: 0;
+}
+
+.postOwner {
+  display: flex;
+  font-size: 12px;
+}
+
+.postTitle,
+.postBody {
+  font-size: 14px;
+  font-weight: 200;
 }

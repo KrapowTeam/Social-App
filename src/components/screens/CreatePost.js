@@ -4,9 +4,9 @@ import '../styles/CreatePost.css';
 import test from '../../assets/Logo.png';
 import M from 'materialize-css';
 import { useHistory } from 'react-router-dom';
+
 export default function CreatePost() {
   const history = useHistory();
-  const [title, setTitle] = React.useState('');
   const [body, setBody] = React.useState('');
   const [postImage, setPostImage] = React.useState('');
   const [imgURL, setImgURL] = React.useState(null);
@@ -25,7 +25,6 @@ export default function CreatePost() {
           authorization: 'Bearer ' + localStorage.getItem('jwt'),
         },
         body: JSON.stringify({
-          title,
           body,
           img: imgURL,
         }),
@@ -87,18 +86,21 @@ export default function CreatePost() {
       )}
       <input
         type='text'
-        placeholder='Your title'
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <input
-        type='text'
         placeholder='Your caption'
         value={body}
         onChange={(e) => setBody(e.target.value)}
       />
       <div className='file-field input-field'>
-        <div className='btn'>
+        <div
+          className='btn #ffd145 yellow darken-1'
+          style={{
+            borderRadius: '1vh',
+            color: 'white',
+            padding: '0.2vh',
+            paddingLeft: '1vh',
+            paddingRight: '1vh',
+          }}
+        >
           <span>Upload</span>
           <input
             type='file'
@@ -115,10 +117,7 @@ export default function CreatePost() {
       </div>
       {console.log(imgBase)}
 
-      <button
-        className='btn waves-effect waves-light #b64b5f6 blue drarken-1'
-        onClick={() => createPost()}
-      >
+      <button className='btn-submit' onClick={() => createPost()}>
         Share!
       </button>
     </div>

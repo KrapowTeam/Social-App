@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import M from 'materialize-css';
 import { useHistory } from 'react-router-dom';
+import '../styles/Forgot.css';
 const Forgotin = (props) => {
   const [email, setEmail] = useState('');
   const history = useHistory();
@@ -28,40 +29,42 @@ const Forgotin = (props) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
-
-        if (data.status === 'Email not found') {
-          M.toast({
-            html: 'Email not founded Please check your email',
-            classes: '#c62828 red darken-3',
-          });
-        } else {
-          M.toast({
-            html: 'Complete reset!.Please check in your email',
-            classes: '#c62828 green darken-3',
-          });
-          history.push('/login');
-        }
+        M.toast({
+          html: 'Complete reset!.Please check in your email',
+          classes: '#c62828 green darken-3',
+        });
+        history.push('/login');
       });
   };
 
   return (
-    <div>
-      <div />
-      <form>
-        <input
-          type='text'
-          // className={styles.input}
-          placeholder='email'
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-          }}
-        />
-        <button type='submit' onClick={handleSubmit}>
-          send
-        </button>
-      </form>
+    <div className='card-forgot'>
+      <div className='addDetail'>
+        <h2 className='formTitle' id='signup'>
+          Forgot Password
+        </h2>
+        <form>
+          <div className='formHolder'>
+            <input
+              type='text'
+              // className={styles.input}
+              placeholder='email'
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
+            />
+          </div>
+          <button
+            className={email ? 'submitBtn' : 'submitBtnDisable'}
+            disabled={!email}
+            type='submit'
+            onClick={handleSubmit}
+          >
+            Send
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

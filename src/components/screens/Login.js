@@ -1,9 +1,11 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { UserContext } from '../../App';
 import '../styles/Login.css';
 import { Link, useHistory } from 'react-router-dom';
 import M from 'materialize-css';
 import validator from 'validator';
+// import ReCAPTCHA from 'react-google-recaptcha';
+import PolicyText from './Policy';
 
 function move() {
   // console.clear();
@@ -32,6 +34,31 @@ function move() {
     });
   });
 }
+
+const Policy = ({ setOpenDialog, setTermAgree, handleRegister }) => {
+  console.log('handle');
+  return (
+    <div className='policyModal'>
+      <div className='policyModal-content'>
+        <button
+          className='close'
+          onClick={() => {
+            setOpenDialog(false);
+          }}
+        >
+          X
+        </button>
+        <h6 className='headPolicy'>นโยบายความเป็นส่วนตัว</h6>
+        <PolicyText
+          setAgree={setTermAgree}
+          dialog={setOpenDialog}
+          register={handleRegister}
+        />
+      </div>
+    </div>
+  );
+};
+
 export default function Login() {
   const history = useHistory();
   const [nameRegis, setNameRegis] = React.useState('');
@@ -41,10 +68,13 @@ export default function Login() {
   const [password, setPassword] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [notice, setNotice] = React.useState(false);
+  const [noticeName, setNoticeName] = React.useState(false);
   const [check, setCheck] = React.useState(false);
   const { state, dispatch } = React.useContext(UserContext);
   const [stateSlide, setStateSlide] = React.useState('signup');
-
+  const [image, setImage] = useState('');
+  const [openDialog, setOpenDialog] = useState(false);
+  const [agree, setAgree] = useState(false);
   useEffect(() => {
     if (passwordRegis === confirmRegis) {
       setCheck(true);
@@ -129,12 +159,12 @@ export default function Login() {
         if (data.error) {
           M.toast({ html: data.error, classes: '#c62828 red darken-3' });
         } else {
-          console.log('login data', data);
-          localStorage.setItem('jwt', data.token);
-          localStorage.setItem('user', JSON.stringify(data.user));
-          dispatch({ type: 'USER', payload: data.user });
+          // console.log('login data', data);
+          // localStorage.setItem('jwt', data.token);
+          // localStorage.setItem('user', JSON.stringify(data.user));
+          dispatch({ type: 'USER_EMAIL', payload: email });
           M.toast({ html: data.message, classes: '#43a047 green darken-1' });
-          history.push('/');
+          history.push('/otp');
         }
       });
     // .catch((e) => {
@@ -146,7 +176,7 @@ export default function Login() {
   };
   const getRegis = (e) => {
     e.preventDefault();
-    if (/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(nameRegis)) {
+    if (/[ `!@#$%^&*()+\-=\[\]{};':"\\|,<>\/?~]/.test(nameRegis)) {
       M.toast({
         html: 'username must have not special character',
         classes: '#c62828 red darken-3',
@@ -199,6 +229,10 @@ export default function Login() {
       });
       return;
     }
+    setOpenDialog(true);
+  };
+  const handleRegister = () => {
+    console.log('SIGNUP');
     fetch('/signup', {
       method: 'post',
       headers: {
@@ -215,13 +249,24 @@ export default function Login() {
         if (data.error) {
           M.toast({ html: data.error, classes: '#c62828 red darken-3' });
         } else {
-          console.log(data);
-          M.toast({ html: data.message, classes: '#43a047 green darken-1' });
+          M.toast({
+            html: 'Succesful Register',
+            classes: '#43a047 green darken-1',
+          });
+          window.location.reload();
         }
       });
+    setOpenDialog(false);
   };
   return (
     <>
+      {openDialog && (
+        <Policy
+          setOpenDialog={setOpenDialog}
+          handleRegister={handleRegister}
+          setTermAgree={setAgree}
+        ></Policy>
+      )}
       <div className='formStructor'>
         <div className='signup slideUp'>
           <h2 className='formTitle' id='signup'>
@@ -235,7 +280,14 @@ export default function Login() {
                 placeholder='Name'
                 value={nameRegis}
                 onChange={(e) => setNameRegis(e.target.value)}
+                onMouseEnter={(e) => setNoticeName(true)}
+                onMouseLeave={(e) => setNoticeName(false)}
               />
+              {noticeName ? (
+                <span className='popupname'>
+                  username must be contain only letter ,nummeric or . and _
+                </span>
+              ) : null}
               <input
                 type='text'
                 className='input'
@@ -261,7 +313,6 @@ export default function Login() {
                   character
                 </span>
               ) : null}
-              {/* {console.log(noticePass)} */}
               <input
                 type='password'
                 className='input'
@@ -284,7 +335,6 @@ export default function Login() {
                 Password not matched
               </p>
             ) : null}
-
             <button
               className={
                 emailRegis && nameRegis && passwordRegis && confirmRegis
@@ -299,8 +349,8 @@ export default function Login() {
               Sign up
             </button>
           </form>
+          {}
         </div>
-
         <div className='login'>
           <div className='center'>
             <h2 className='formTitle' id='login'>
@@ -323,6 +373,7 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
+
               <button
                 type='submit'
                 className='submitBtn'

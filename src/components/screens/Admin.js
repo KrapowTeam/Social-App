@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import '../styles/Profile.css';
+import '../styles/Admin.css';
 import { faHeart, faCog, faComment } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Moment from 'moment';
@@ -14,7 +14,6 @@ export default function Admin() {
   const [search, setSearch] = useState(null);
 
   React.useEffect(() => {
-    console.log(state);
     fetch('/logs', {
       headers: {
         authorization: 'Bearer ' + localStorage.getItem('jwt'),
@@ -22,7 +21,6 @@ export default function Admin() {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         setData({
           columns: [
             {
@@ -38,44 +36,35 @@ export default function Admin() {
               width: 150,
             },
             {
-              label: 'Date',
-              field: 'time',
+              label: 'Time',
+              field: 'timeFromNow',
               sort: 'asc',
               width: 150,
             },
           ],
-          rows: res.logs,
+          rows: res.updated,
         });
       })
       .catch((err) => {
         console.log(err);
+        // res.json({ error: 'Something went wrong' });
       });
   }, []);
 
   return (
     <>
-      <div className='all'>
-        <h3>history Login-Logout</h3>
-        {/* <input
-          type='text'
-          placeholder='email/action...'
-          onChange={(e) => e.target.value}
-        /> */}
-        <MDBDataTable striped bordered small data={data} />
-        {/* {data.map((val, key) => {
-            return (
-              <>
-                <tbody>
-                  <tr>
-                    <td>{val.email}</td>
-                    <td>{val.event}</td>
-                    <td>{moment(val.time).startOf('day').fromNow()}</td>
-                  </tr>
-                </tbody>
-              </>
-            );
-          })} */}
-      </div>
+      {state ? (
+        state.email === 'phakawat.ta@ku.th' ? (
+          <div className='card-all'>
+            <h3>history event</h3>
+            <MDBDataTable striped bordered small id='logTable' data={data} />
+          </div>
+        ) : (
+          <h1>PAGE NOT FOUND</h1>
+        )
+      ) : (
+        <h1>PAGE NOT FOUND</h1>
+      )}
     </>
   );
 }

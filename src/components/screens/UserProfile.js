@@ -34,11 +34,7 @@ export default function Profile() {
           <div className='container'>
             <div className='profile'>
               <div className='profile-image'>
-                <img
-                  className='pimg'
-                  src='https://static.wikia.nocookie.net/adf25491-c481-48c6-bec5-0586ba019662'
-                  alt=''
-                />
+                <img className='pimg' src={userProfile.user.pic} alt='' />
               </div>
 
               <div className='profile-user-settings'>
