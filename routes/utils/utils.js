@@ -1,4 +1,7 @@
 const mailer = require('nodemailer');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../../keys');
 const generateOTP = () => {
   // Declare a digits variable
   // which stores all digits
@@ -75,7 +78,52 @@ const sendOTPEmail = (email, otp) => {
     }
   });
 };
+const sendVerifiedEmail = (id, email) => {
+  // async email
+  jwt.sign(
+    {
+      id: id,
+    },
+    JWT_SECRET,
+    {
+      expiresIn: '1d',
+    },
+    (err, emailToken) => {
+      const url = `http://localhost:5000/confirmation/${emailToken}`;
+      var smtp = {
+        host: 'smtp.gmail.com', //set to your host name or ip
+        port: 587, //25, 465, 587 depend on your
+        secure: false, // use SSL
+        auth: {
+          user: 'phakawat.ta@ku.th', //user account
+          pass: '@MilkShake77', //user password
+        },
+      };
 
+      var smtpTransport = mailer.createTransport(smtp);
+
+      var mail = {
+        from: 'no-reply@kaidow.th',
+        to: email,
+        subject: 'Confirm Email',
+        html: `Please click this email to confirm your email: <a href="${url}"><button>Click Here</button></a>`,
+      };
+
+      smtpTransport.sendMail(mail, function (err, response) {
+        smtpTransport.close();
+        if (err) {
+          //error handler
+          conole.log('Fail to Send Email', err);
+        } else {
+          //success handler
+          console.log('send email success', response);
+        }
+      });
+    }
+  );
+};
+
+exports.sendVerifiedEmail = sendVerifiedEmail;
 exports.generateOTP = generateOTP;
 exports.sendOTPEmail = sendOTPEmail;
 exports.sendResetEmail = sendResetEmail;

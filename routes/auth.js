@@ -8,67 +8,16 @@ const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../keys');
 const requireLogin = require('../middleware/requireLogin');
 const mailer = require('nodemailer');
-const { generateOTP, sendResetEmail, sendOTPEmail } = require('./utils/utils');
+const {
+  generateOTP,
+  sendResetEmail,
+  sendOTPEmail,
+  sendVerifiedEmail,
+} = require('./utils/utils');
 const Log = mongoose.model('Log');
 const moment = require('moment');
 router.get('/', (req, res) => {
   res.send('hello social app');
-});
-
-// check password
-router.post('/signup', (req, res) => {
-  const { name, email, password } = req.body;
-
-  if (!email || !password || !name) {
-    return res.status(422).json({ error: 'Please input all fields' });
-  }
-  if (
-    !validator.isStrongPassword(req.body.password, {
-      minLowercase: 1,
-      minUppercase: 1,
-      minNumbers: 1,
-      minSymbols: 1,
-    })
-  ) {
-    return res.status(422).json({
-      error:
-        'Password must contain at least one lower-case letter, one upper-case letter, one digit and a special character',
-    });
-  }
-
-  User.findOne({ email: email, name: name })
-    .then((savedUser) => {
-      if (savedUser) {
-        return res.status(422).json({ error: 'User already exists' });
-      }
-      bcrypt.hash(password, 12).then((hashedPass) => {
-        const user = new User({
-          email,
-          password: hashedPass,
-          name,
-          checkLogin: {
-            count: 0,
-            delayTime: new Date().getTime(),
-          },
-          expirePasswordDate: new Date(
-            new Date().getTime() + 1000 * 60 * 60 * 24 * 90
-          ),
-        });
-        // console.log('BEFOREUSER : ', user);
-        user
-          .save()
-          .then((user) => {
-            res.json({ message: 'User Added', user: user });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      });
-    })
-
-    .catch((err) => {
-      console.log(err);
-    });
 });
 
 router.post('/login', (req, res) => {
@@ -82,6 +31,9 @@ router.post('/login', (req, res) => {
       console.log('saveUser:', savedUser.checkLogin);
       if (!savedUser) {
         return res.status(422).json({ error: 'Email not found' });
+      }
+      if (!savedUser.isVerified) {
+        return res.status(422).json({ error: 'Please Verify Email' });
       }
 
       if (new Date().getTime() < savedUser.checkLogin.delayTime) {
@@ -101,11 +53,11 @@ router.post('/login', (req, res) => {
           console.log('loginSUccess');
           // res.json({ message: 'Signin Successfully' });
           const token = jwt.sign({ _id: savedUser._id }, JWT_SECRET);
-          const { _id, name, email, checkLogin, expirePasswordDate } =
+          const { _id, name, email, checkLogin, expirePasswordDate, pic } =
             savedUser;
           const resp = {
             message: 'Successfully Login',
-            user: { _id, name, email, expirePasswordDate },
+            user: { _id, name, email, expirePasswordDate, pic },
             token: token,
           };
           User.findByIdAndUpdate(
@@ -323,7 +275,10 @@ router.put('/setPassword', (req, res) => {
           .then(async (doMatch) => {
             if (doMatch) {
               err = true;
-              res.json({ status: 'error', info: 'password must meaow meaow' });
+              res.json({
+                status: 'error',
+                info: 'Sorry, your new password must not be the same as your old password. ',
+              });
             }
           });
         if (!err) {
@@ -345,8 +300,8 @@ router.put('/setPassword', (req, res) => {
               // .slice(0, 19)
               // .replace('T', ' ');
               const log = new Log({
-                email,
-                event: 'reset password',
+                email: savedUser.email,
+                event: 'Reset Password',
                 time: Now,
               });
 
@@ -385,13 +340,15 @@ router.post('/verifiedOTP', (req, res) => {
   const { otp, email } = req.body;
   User.findOne({ email: email }).then(async (user) => {
     const token = jwt.sign({ _id: user._id }, JWT_SECRET);
-    const { _id, name, email, expirePasswordDate } = user;
+    const { _id, name, email, expirePasswordDate, checkOTP, pic } = user;
     const resp = {
       message: 'Successfully Login',
-      user: { _id, name, email, expirePasswordDate },
+      user: { _id, name, email, expirePasswordDate, checkOTP, pic },
       token: token,
     };
-    if (otp === user.otp) {
+    // console.log('Date now', new Dae());
+    console.log('expireTime', new Date(parseInt(checkOTP.expireTime)));
+    if (otp === checkOTP.otp && new Date().getTime() < checkOTP.expireTime) {
       const newOtp = generateOTP();
       await User.findByIdAndUpdate(
         _id,
@@ -410,5 +367,43 @@ router.post('/verifiedOTP', (req, res) => {
     }
   });
 });
+////-----sendOTPAgian-------////
+router.post('/sendOTP', (req, res) => {
+  const { email } = req.body;
+  User.findOne({ email: email }).then(async (user) => {
+    const { _id, checkOTP } = user;
 
+    if (checkOTP.expireTime < new Date().getTime()) {
+      const newOtp = generateOTP();
+      await User.findByIdAndUpdate(
+        _id,
+        {
+          checkOTP: {
+            otp: newOtp,
+            expireTime: new Date().getTime() + 3 * 60000,
+          },
+        },
+        { new: true }
+      ).then((res, err) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log('OTP', res.checkOTP);
+          sendOTPEmail(email, res.checkOTP.otp);
+        }
+      });
+
+      return res
+        .status(200)
+        .json({ status: ' Please check OTP in your email' });
+    } else {
+      const time = (
+        (checkOTP.expireTime - new Date().getTime()) /
+        (60 * 1000)
+      ).toFixed(2);
+
+      return res.status(422).json({ status: `Please wait ${time} minute` });
+    }
+  });
+});
 module.exports = router;

@@ -22,14 +22,13 @@ router.get('/allpost', requireLogin, (req, res) => {
 });
 
 router.post('/createpost', requireLogin, (req, res) => {
-  const { title, body, img } = req.body;
+  const { body, img } = req.body;
   console.log('req.body', req.body);
-  if (!title || !body || !img) {
+  if (!body || !img) {
     return res.status(422).json({ error: 'Please add all the fields' });
   }
   req.user.password = undefined;
   const post = new Post({
-    title,
     body,
     photo: img,
     postedBy: req.user,
@@ -96,6 +95,9 @@ router.put('/comment', requireLogin, (req, res) => {
     text: req.body.text,
     postedBy: req.user._id,
   };
+  if (!req.body.text) {
+    return res.status(422).json({ message: 'Comment must not empty' });
+  }
   Post.findByIdAndUpdate(
     req.body.postId,
     {
