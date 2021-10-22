@@ -20,6 +20,22 @@ router.get('/allpost', requireLogin, (req, res) => {
       res.status(400).json({ error: err });
     });
 });
+router.get('/getsubpost', requireLogin, (req, res) => {
+  console.log('select all post');
+  let mysort = { _id: -1 };
+  Post.find({ postedBy: { $in: req.user.following } })
+    .sort(mysort)
+    .populate('postedBy', '_id name')
+    .populate('comments.postedBy', '_id name')
+    .then((posts) => {
+      // console.log(posts);
+      res.json({ posts });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).json({ error: err });
+    });
+});
 
 router.post('/createpost', requireLogin, (req, res) => {
   const { body, img } = req.body;
@@ -56,7 +72,6 @@ router.get('/myposts', requireLogin, (req, res) => {
     });
 });
 router.put('/like', requireLogin, (req, res) => {
-  console.log('asdasd');
   Post.findByIdAndUpdate(
     req.body.postId,
     {
@@ -65,13 +80,17 @@ router.put('/like', requireLogin, (req, res) => {
     {
       new: true,
     }
-  ).exec((err, result) => {
-    if (err) {
-      return res.status(422).json({ error: err });
-    } else {
-      res.json(result);
-    }
-  });
+  )
+    .populate('postedBy', '_id name')
+    .populate('comments.postedBy', '_id name')
+    .exec((err, result) => {
+      if (err) {
+        return res.status(422).json({ error: err });
+      } else {
+        console.log('like', result);
+        res.json(result);
+      }
+    });
 });
 router.put('/unlike', requireLogin, (req, res) => {
   Post.findByIdAndUpdate(
@@ -82,13 +101,18 @@ router.put('/unlike', requireLogin, (req, res) => {
     {
       new: true,
     }
-  ).exec((err, result) => {
-    if (err) {
-      return res.status(422).json({ error: err });
-    } else {
-      res.json(result);
-    }
-  });
+  )
+    .populate('postedBy', '_id name')
+    .populate('comments.postedBy', '_id name')
+    .exec((err, result) => {
+      if (err) {
+        return res.status(422).json({ error: err });
+      } else {
+        console.log('unlike', result);
+
+        res.json(result);
+      }
+    });
 });
 router.put('/comment', requireLogin, (req, res) => {
   const comment = {
@@ -107,6 +131,7 @@ router.put('/comment', requireLogin, (req, res) => {
       new: true,
     }
   )
+    .populate('postedBy', '_id name')
     .populate('comments.postedBy', '_id name')
     .exec((err, result) => {
       if (err) {
