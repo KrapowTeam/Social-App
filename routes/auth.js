@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../keys');
 const requireLogin = require('../middleware/requireLogin');
 const mailer = require('nodemailer');
+const dotenv = require('dotenv').config();
 const {
   generateOTP,
   sendResetEmail,
@@ -17,7 +18,53 @@ const {
 const Log = mongoose.model('Log');
 const moment = require('moment');
 router.get('/', (req, res) => {
-  res.send('hello social app');
+  res.json({ message: process.env.test });
+});
+
+router.post('/signin', (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(422).json({ error: 'please add email or password' });
+  }
+  User.findOne({ email: email }).then((savedUser) => {
+    if (!savedUser) {
+      return res.status(422).json({ error: 'Invalid Email or password' });
+    }
+    bcrypt
+      .compare(password, savedUser.password)
+      .then((doMatch) => {
+        if (doMatch) {
+          // res.json({message:"successfully signed in"})
+          const token = jwt.sign({ _id: savedUser._id }, JWT_SECRET);
+          const { _id, name, email, followers, following, pic } = savedUser;
+          const log = new Log({
+            email,
+            event: 'login',
+            time: Now,
+          });
+
+          log
+            .save()
+            .then((result) => {
+              // res.send({ log: result });
+              console.log('login: ', result);
+            })
+            .catch((err) => {
+              console.log('error: ', err);
+            });
+          res.json({
+            token,
+            user: { _id, name, email, followers, following, pic },
+            message: 'Successfully signin!',
+          });
+        } else {
+          return res.status(422).json({ error: 'Invalid Email or password' });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
 });
 
 router.post('/login', (req, res) => {
@@ -107,8 +154,8 @@ router.post('/login', (req, res) => {
               port: 587, //25, 465, 587 depend on your
               secure: false, // use SSL
               auth: {
-                user: 'phakawat.ta@ku.th', //user account
-                pass: '@MilkShake77', //user password
+                user: process.env.SMTP_USER, //user account
+                pass: process.env.SMTP_PASS, //user password
               },
             };
             var smtpTransport = mailer.createTransport(smtp);
@@ -406,4 +453,55 @@ router.post('/sendOTP', (req, res) => {
     }
   });
 });
+
+router.post('/register', (req, res) => {
+  const { name, email, password, pic } = req.body;
+  if (!email || !password || !name) {
+    return res.status(422).json({ error: 'please add all the fields' });
+  }
+  User.findOne({ email: email })
+    .then((savedUser) => {
+      if (savedUser) {
+        return res
+          .status(422)
+          .json({ error: 'user already exists with that email' });
+      }
+      bcrypt.hash(password, 12).then((hashedpassword) => {
+        const user = new User({
+          email,
+          password: hashedpassword,
+          name,
+          pic,
+        });
+        let Now = new Date(new Date().getTime() + 1000 * 60 * 60 * 7);
+        user
+          .save()
+          .then((user) => {
+            res.json({ message: 'Signup successfully' });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+        const log = new Log({
+          email,
+          event: 'Signup',
+          time: Now,
+        });
+
+        log
+          .save()
+          .then((result) => {
+            // res.send({ log: result });
+            console.log('login: ', result);
+          })
+          .catch((err) => {
+            console.log('error: ', err);
+          });
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
 module.exports = router;

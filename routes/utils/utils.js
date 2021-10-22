@@ -23,8 +23,8 @@ const sendResetEmail = ({ email, expirePasswordDate }) => {
     port: 587, //25, 465, 587 depend on your
     secure: false, // use SSL
     auth: {
-      user: 'phakawat.ta@ku.th', //user account
-      pass: '@MilkShake77', //user password
+      user: process.env.SMTP_USER, //user account
+      pass: process.env.SMTP_PASS, //user password
     },
   };
   var smtpTransport = mailer.createTransport(smtp);
@@ -54,8 +54,8 @@ const sendOTPEmail = (email, otp) => {
     port: 587, //25, 465, 587 depend on your
     secure: false, // use SSL
     auth: {
-      user: 'phakawat.ta@ku.th', //user account
-      pass: '@MilkShake77', //user password
+      user: process.env.SMTP_USER, //user account
+      pass: process.env.SMTP_PASS, //user password
     },
   };
   var smtpTransport = mailer.createTransport(smtp);
@@ -95,8 +95,8 @@ const sendVerifiedEmail = (id, email) => {
         port: 587, //25, 465, 587 depend on your
         secure: false, // use SSL
         auth: {
-          user: 'phakawat.ta@ku.th', //user account
-          pass: '@MilkShake77', //user password
+          user: process.env.SMTP_USER, //user account
+          pass: process.env.SMTP_PASS, //user password
         },
       };
 

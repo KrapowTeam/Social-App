@@ -4,12 +4,12 @@ const mongoose = require('mongoose');
 const requireLogin = require('../middleware/requireLogin');
 const Log = mongoose.model('Log');
 const moment = require('moment');
-
+const dotenv = require('dotenv').config();
 router.get('/logs', requireLogin, (req, res) => {
   let Now = new Date(new Date().getTime() + 1000 * 60 * 60 * 7);
   console.log(req.user.email);
   let mysort = { _id: -1 };
-  if (req.user.email === 'phakawat.ta@ku.th') {
+  if (req.user.email === process.env.SMTP_USER) {
     Log.find()
       .sort(mysort)
       .then(async (logs) => {
