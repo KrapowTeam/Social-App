@@ -160,11 +160,12 @@ export default function Login() {
           M.toast({ html: data.error, classes: '#c62828 red darken-3' });
         } else {
           // console.log('login data', data);
-          // localStorage.setItem('jwt', data.token);
-          // localStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('jwt', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
           dispatch({ type: 'USER_EMAIL', payload: email });
           M.toast({ html: data.message, classes: '#43a047 green darken-1' });
           history.push('/otp');
+          // history.push('/');
         }
       });
     // .catch((e) => {

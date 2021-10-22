@@ -19,6 +19,7 @@ import Otp from './components/screens/Otp';
 import Forgotin from './components/screens/Forgotin';
 import CreatePost from './components/screens/CreatePost';
 import UserProfile from './components/screens/UserProfile';
+import NotFound from './components/screens/NotFound';
 import { reducer, initialState } from './reducers/userReducers';
 export const UserContext = React.createContext();
 
@@ -38,11 +39,11 @@ const Routing = () => {
       if (location.pathname === '/forgotpassword') {
         history.push('/');
       }
-      if (location.pathname === '/otp') {
-        history.push('/');
-      }
+      // if (location.pathname === '/otp') {
+      //   history.push('/');
+      // }
 
-      // history.push('/');
+      history.push('/');
     } else {
       console.log(location);
       if (location.pathname === '/forgotpassword') {
@@ -54,6 +55,16 @@ const Routing = () => {
     }
   }, []);
 
+  // React.useEffect(() => {
+  //   const user = JSON.parse(localStorage.getItem('user'));
+  //   console.log('effect');
+  //   if (user) {
+  //     dispatch({ type: 'USER', payload: user });
+  //   } else {
+  //     if (!history.location.pathname.startsWith('/reset'))
+  //       history.push('/Login');
+  //   }
+  // }, []);
   return (
     <>
       <Switch>

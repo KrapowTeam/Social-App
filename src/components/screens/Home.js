@@ -7,10 +7,11 @@ import { UserContext } from '../../App';
 import { Link } from 'react-router-dom';
 import M from 'materialize-css';
 export default function Home() {
-  const [data, setData] = React.useState([]);
+  const [data, setData] = React.useState(null);
   const { state, dispatch } = useContext(UserContext);
+  const [loader, setLoader] = React.useState(true);
   React.useEffect(() => {
-    console.log(state);
+    // console.log(state);
     fetch('/allpost', {
       headers: {
         authorization: 'Bearer ' + localStorage.getItem('jwt'),
@@ -20,6 +21,7 @@ export default function Home() {
       .then((res) => {
         console.log(res.posts);
         setData(res.posts);
+        setLoader(false);
       })
       .catch((err) => {
         console.log(err);
@@ -138,112 +140,118 @@ export default function Home() {
   };
   return (
     <div className='home'>
-      {console.log(state)}
-      {data.map((item) => {
-        return (
-          <>
-            <div className='card home-card'>
-              <div className='card-image'>
-                <img alt='postImg' src={item.photo} />
-              </div>
-              <div className='card-content'>
-                <div>
-                  {item.likes.includes(state._id) ? (
-                    <img
-                      src={LoveFilled}
-                      className='likeIcon'
-                      alt='likeIconUnfilled'
-                      onClick={() => {
-                        unLikePost(item._id);
-                      }}
-                    />
-                  ) : (
-                    <img
-                      src={Love}
-                      className='likeIcon'
-                      alt='likeIconUnfilled'
-                      onClick={() => {
-                        likePost(item._id);
-                      }}
-                    />
-                  )}
-                  {item.postedBy._id == state._id && (
-                    <img
-                      src={Delete}
-                      className='likeIcon'
-                      style={{ float: 'right' }}
-                      onClick={() => deletePost(item._id)}
-                    />
-                  )}
-                  <h6 style={{ marginTop: '5px' }}>
-                    {item.likes.length}{' '}
-                    {item.likes.length == 1 || item.likes.length == 0
-                      ? 'like'
-                      : 'likes'}
-                  </h6>
+      {loader === true ? (
+        <div className='loader'></div>
+      ) : data.length !== 0 ? (
+        data.map((item) => {
+          return (
+            <>
+              <div className='card home-card'>
+                <div className='card-image'>
+                  <img alt='postImg' src={item.photo} />
                 </div>
-                <div className='postOwner'>
-                  <h6>
-                    <Link
-                      to={
-                        item.postedBy._id !== state._id
-                          ? '/profile/' + item.postedBy._id
-                          : '/profile'
-                      }
-                      style={{
-                        cursor: 'pointer',
-                        fontWeight: '500',
-                      }}
-                    >
-                      {item.postedBy.name}
-                    </Link>
-                    <span className='postBody'> {item.body}</span>
-                  </h6>
-                </div>
-                <hr />
-                {item.comments.map((record) => {
-                  return (
-                    <h6 key={record._id}>
-                      <span
+                <div className='card-content'>
+                  <div>
+                    {item.likes.includes(state._id) ? (
+                      <img
+                        src={LoveFilled}
+                        className='likeIcon'
+                        alt='likeIconUnfilled'
+                        onClick={() => {
+                          unLikePost(item._id);
+                        }}
+                      />
+                    ) : (
+                      <img
+                        src={Love}
+                        className='likeIcon'
+                        alt='likeIconUnfilled'
+                        onClick={() => {
+                          likePost(item._id);
+                        }}
+                      />
+                    )}
+                    {item.postedBy._id == state._id && (
+                      <img
+                        src={Delete}
+                        className='likeIcon'
+                        style={{ float: 'right' }}
+                        onClick={() => deletePost(item._id)}
+                      />
+                    )}
+                    <h6 style={{ marginTop: '5px' }}>
+                      {item.likes.length}{' '}
+                      {item.likes.length == 1 || item.likes.length == 0
+                        ? 'like'
+                        : 'likes'}
+                    </h6>
+                  </div>
+                  <div className='postOwner'>
+                    <h6>
+                      <Link
+                        to={
+                          item.postedBy._id !== state._id
+                            ? '/profile/' + item.postedBy._id
+                            : '/profile'
+                        }
                         style={{
-                          fontWeight: '500',
-                          fontSize: '14px',
                           cursor: 'pointer',
+                          fontWeight: '500',
                         }}
                       >
-                        <Link
-                          to={
-                            record.postedBy._id !== state._id
-                              ? '/profile/' + item.postedBy._id
-                              : '/profile/'
-                          }
-                        >
-                          {record.postedBy.name}
-                        </Link>
-                      </span>{' '}
-                      {'  '} {record.text}
+                        {item.postedBy.name}
+                      </Link>
+                      <span className='postBody'> {item.body}</span>
                     </h6>
-                  );
-                })}
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    makeComment(e.target[0].value, item._id);
-                  }}
-                >
-                  <input
-                    type='text'
-                    // id='addsomecomment' // {item._id}
-                    id={item._id}
-                    placeholder='Add some comment'
-                    autoComplete='off'
-                  />
-                </form>
+                  </div>
+                  <hr />
+                  {item.comments.map((record) => {
+                    return (
+                      <h6 key={record._id}>
+                        <span
+                          style={{
+                            fontWeight: '500',
+                            fontSize: '14px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <Link
+                            to={
+                              record.postedBy._id !== state._id
+                                ? '/profile/' + item.postedBy._id
+                                : '/profile/'
+                            }
+                          >
+                            {record.postedBy.name}
+                          </Link>
+                        </span>{' '}
+                        {'  '} {record.text}
+                      </h6>
+                    );
+                  })}
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      makeComment(e.target[0].value, item._id);
+                    }}
+                  >
+                    <input
+                      type='text'
+                      // id='addsomecomment' // {item._id}
+                      id={item._id}
+                      placeholder='Add some comment'
+                      autoComplete='off'
+                    />
+                  </form>
+                </div>
               </div>
-            </div>
-          </>
-        );
-      })}
+              ;
+            </>
+          );
+        })
+      ) : (
+        <h1>There's no posts.</h1>
+      )}
     </div>
   );
 }

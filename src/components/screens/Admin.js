@@ -53,18 +53,18 @@ export default function Admin() {
 
   return (
     <>
-      {state ? (
-        state.email === 'phakawat.ta@ku.th' ? (
-          <div className='card-all'>
-            <h3>history event</h3>
-            <MDBDataTable striped bordered small id='logTable' data={data} />
-          </div>
-        ) : (
+      {/* {state ? (
+        state.email === 'phakawat.ta@ku.th' ? ( */}
+      <div className='card-all'>
+        <h3>history event</h3>
+        <MDBDataTable striped bordered small id='logTable' data={data} />
+      </div>
+      {/* ) : (
           <h1>PAGE NOT FOUND</h1>
         )
       ) : (
         <h1>PAGE NOT FOUND</h1>
-      )}
+      )} */}
     </>
   );
 }
