@@ -62,6 +62,7 @@ export default function Profile() {
   const updatePhoto = (file) => {
     setImage(file);
   };
+
   return (
     <>
       {state ? (
@@ -95,10 +96,16 @@ export default function Profile() {
                     posts
                   </li>
                   <li>
-                    <span className='profile-stat-count'>188</span> followers
+                    <span className='profile-stat-count'>
+                      {state ? state.followers.length : '0'}
+                    </span>{' '}
+                    followers
                   </li>
                   <li>
-                    <span className='profile-stat-count'>206</span> following
+                    <span className='profile-stat-count'>
+                      {state ? state.following.length : '0'}
+                    </span>{' '}
+                    following
                   </li>
                 </ul>
               </div>

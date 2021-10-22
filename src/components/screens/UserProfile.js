@@ -7,10 +7,12 @@ import { useParams } from 'react-router-dom';
 
 export default function Profile() {
   const [userProfile, setProfile] = useState(null);
+  const [showfollow, setShowFollow] = useState(true);
   const { state, dispatch } = useContext(UserContext);
   const { userid } = useParams();
 
   useEffect(() => {
+    console.log(userid);
     fetch(`/user/${userid}`, {
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('jwt'),
@@ -18,15 +20,77 @@ export default function Profile() {
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
-        console.log(userid);
         setProfile(result);
       })
       .catch((e) => {
         console.log('error ', e);
       });
   }, []);
-
+  const followUser = () => {
+    fetch('/follow', {
+      method: 'put',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('jwt'),
+      },
+      body: JSON.stringify({
+        followId: userid,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        dispatch({
+          type: 'UPDATE',
+          payload: { following: data.following, followers: data.followers },
+        });
+        localStorage.setItem('user', JSON.stringify(data));
+        setProfile((prevState) => {
+          return {
+            ...prevState,
+            user: {
+              ...prevState.user,
+              followers: [...prevState.user.followers, data._id],
+            },
+          };
+        });
+        setShowFollow(false);
+      });
+  };
+  const unfollowUser = () => {
+    fetch('/unfollow', {
+      method: 'put',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('jwt'),
+      },
+      body: JSON.stringify({
+        unfollowId: userid,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        dispatch({
+          type: 'UPDATE',
+          payload: { following: data.following, followers: data.followers },
+        });
+        localStorage.setItem('user', JSON.stringify(data));
+        setProfile((prevState) => {
+          const newFollower = prevState.user.followers.filter(
+            (item) => item != data._id
+          );
+          return {
+            ...prevState,
+            user: {
+              ...prevState.user,
+              followers: newFollower,
+            },
+          };
+        });
+        setShowFollow(true);
+      });
+  };
   return (
     <>
       {userProfile ? (
@@ -62,10 +126,16 @@ export default function Profile() {
                     posts
                   </li>
                   <li>
-                    <span className='profile-stat-count'>188</span> followers
+                    <span className='profile-stat-count'>
+                      {userProfile.user.followers.length}
+                    </span>{' '}
+                    followers
                   </li>
                   <li>
-                    <span className='profile-stat-count'>206</span> following
+                    <span className='profile-stat-count'>
+                      {userProfile.user.following.length}
+                    </span>{' '}
+                    following
                   </li>
                 </ul>
               </div>
@@ -76,6 +146,21 @@ export default function Profile() {
                   Investor
                 </p>
               </div>
+              {showfollow ? (
+                <button
+                  className='btn waves-effect waves-light #b645f6 blue darken-1'
+                  onClick={() => followUser()}
+                >
+                  FOLLOW
+                </button>
+              ) : (
+                <button
+                  className='btn waves-effect waves-light #b645f6 blue darken-1'
+                  onClick={() => unfollowUser()}
+                >
+                  UNFOLLOW
+                </button>
+              )}
             </div>
           </div>
           <div className='container'>

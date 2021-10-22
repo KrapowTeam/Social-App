@@ -20,6 +20,7 @@ import Forgotin from './components/screens/Forgotin';
 import CreatePost from './components/screens/CreatePost';
 import UserProfile from './components/screens/UserProfile';
 import NotFound from './components/screens/NotFound';
+import SubscribesUser from './components/screens/SubscribesUser';
 import { reducer, initialState } from './reducers/userReducers';
 export const UserContext = React.createContext();
 
@@ -80,7 +81,7 @@ const Routing = () => {
         <Route path='/profile/:userid'>
           <UserProfile />
         </Route>
-        <Route path='/profile'>
+        <Route exact path='/profile'>
           <Profile />
         </Route>
         <Route path='/create'>
@@ -89,7 +90,9 @@ const Routing = () => {
         <Route path='/forgot'>
           <Forgot />
         </Route>
-
+        <Route path='/myfollowingpost'>
+          <SubscribesUser />
+        </Route>
         <Route path='/admin'>
           <Admin />
         </Route>

@@ -42,6 +42,11 @@ export default function Navbar() {
                   <img src={Home} className='icon' alt='homeIcon' />
                 </Link>
               </li>
+              <li>
+                <Link to='/myfollowingpost'>
+                  <img src={Home} className='icon' alt='homeIcon' />
+                </Link>
+              </li>
               {/* <li>
             <Link to='/Login'>
               <img src={key} className='icon' alt='loginIcon' />

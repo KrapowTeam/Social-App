@@ -7,12 +7,12 @@ import { UserContext } from '../../App';
 import { Link } from 'react-router-dom';
 import M from 'materialize-css';
 export default function Home() {
-  const [data, setData] = React.useState([]);
+  const [data, setData] = React.useState(null);
   const { state, dispatch } = useContext(UserContext);
   const [loader, setLoader] = React.useState(true);
   React.useEffect(() => {
     // console.log(state);
-    fetch('/allpost', {
+    fetch('/getsubpost', {
       headers: {
         authorization: 'Bearer ' + localStorage.getItem('jwt'),
       },
@@ -43,6 +43,7 @@ export default function Home() {
       .then((result) => {
         const newData = data.map((item) => {
           if (item._id == result._id) {
+            console.log('like :', result);
             return result;
           } else {
             return item;
@@ -50,7 +51,6 @@ export default function Home() {
         });
         console.log('data on like ', newData);
         setData(newData);
-        // setLoader(false);
       })
       .catch((err) => {
         console.log(err);
@@ -77,12 +77,7 @@ export default function Home() {
             return item;
           }
         });
-        console.log('data on unlike ', newData);
         setData(newData);
-        // setLoader(false);
-      })
-      .catch((err) => {
-        console.log(err);
       });
   };
   const makeComment = (text, postId) => {
@@ -163,7 +158,6 @@ export default function Home() {
                         className='likeIcon'
                         alt='likeIconUnfilled'
                         onClick={() => {
-                          // setLoader(true);
                           unLikePost(item._id);
                         }}
                       />
@@ -173,7 +167,6 @@ export default function Home() {
                         className='likeIcon'
                         alt='likeIconUnfilled'
                         onClick={() => {
-                          // setLoader(true);
                           likePost(item._id);
                         }}
                       />
@@ -201,7 +194,6 @@ export default function Home() {
                             ? '/profile/' + item.postedBy._id
                             : '/profile'
                         }
-                        // to={'/profile/' + item.postedBy._id}
                         style={{
                           cursor: 'pointer',
                           fontWeight: '500',
@@ -209,7 +201,6 @@ export default function Home() {
                       >
                         {item.postedBy.name}
                       </Link>
-
                       <span className='postBody'> {item.body}</span>
                     </h6>
                   </div>
