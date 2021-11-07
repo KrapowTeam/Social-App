@@ -100,11 +100,27 @@ router.post('/login', (req, res) => {
           console.log('loginSUccess');
           // res.json({ message: 'Signin Successfully' });
           const token = jwt.sign({ _id: savedUser._id }, JWT_SECRET);
-          const { _id, name, email, checkLogin, expirePasswordDate, pic } =
-            savedUser;
+          const {
+            _id,
+            name,
+            email,
+            checkLogin,
+            expirePasswordDate,
+            pic,
+            followers,
+            following,
+          } = savedUser;
           const resp = {
             message: 'Successfully Login',
-            user: { _id, name, email, expirePasswordDate, pic },
+            user: {
+              _id,
+              name,
+              email,
+              expirePasswordDate,
+              pic,
+              followers,
+              following,
+            },
             token: token,
           };
           User.findByIdAndUpdate(
@@ -387,10 +403,28 @@ router.post('/verifiedOTP', (req, res) => {
   const { otp, email } = req.body;
   User.findOne({ email: email }).then(async (user) => {
     const token = jwt.sign({ _id: user._id }, JWT_SECRET);
-    const { _id, name, email, expirePasswordDate, checkOTP, pic } = user;
+    const {
+      _id,
+      name,
+      email,
+      expirePasswordDate,
+      checkOTP,
+      pic,
+      followers,
+      following,
+    } = user;
     const resp = {
       message: 'Successfully Login',
-      user: { _id, name, email, expirePasswordDate, checkOTP, pic },
+      user: {
+        _id,
+        name,
+        email,
+        expirePasswordDate,
+        checkOTP,
+        pic,
+        followers,
+        following,
+      },
       token: token,
     };
     // console.log('Date now', new Dae());

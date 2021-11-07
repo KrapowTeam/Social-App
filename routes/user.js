@@ -35,6 +35,23 @@ router.put('/updatepic', requireLogin, (req, res) => {
     }
   );
 });
+
+router.put('/updateName', requireLogin, (req, res) => {
+  User.findByIdAndUpdate(
+    req.user._id,
+    { $set: { name: req.body.name } },
+    { new: true },
+    (err, result) => {
+      if (err) {
+        return res
+          .status(422)
+          .json({ error: 'Error occurred while updating name' });
+      }
+      res.json(result);
+    }
+  );
+});
+
 router.put('/follow', requireLogin, (req, res) => {
   User.findByIdAndUpdate(
     req.body.followId,
