@@ -44,10 +44,12 @@ router.post('/createpost', requireLogin, (req, res) => {
     return res.status(422).json({ error: 'Please add all the fields' });
   }
   req.user.password = undefined;
+  let Now = new Date(new Date().getTime() + 1000 * 60 * 60 * 7);
   const post = new Post({
     body,
     photo: img,
     postedBy: req.user,
+    datetime: Now,
   });
   post
     .save()
