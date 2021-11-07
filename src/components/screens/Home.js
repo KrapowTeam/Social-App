@@ -6,10 +6,12 @@ import Delete from '../../assets/delete.png';
 import { UserContext } from '../../App';
 import { Link } from 'react-router-dom';
 import M from 'materialize-css';
+import Moment from 'moment';
 export default function Home() {
   const [data, setData] = React.useState([]);
   const { state, dispatch } = useContext(UserContext);
   const [loader, setLoader] = React.useState(true);
+  let Now = new Date(new Date().getTime() + 1000 * 60 * 60 * 7);
   React.useEffect(() => {
     // console.log(state);
     fetch('/allpost', {
@@ -192,6 +194,15 @@ export default function Home() {
                         ? 'like'
                         : 'likes'}
                     </h6>
+                    <span
+                      style={{
+                        float: 'right',
+                        fontSize: '14px',
+                        color: 'rgb(187,187,187)',
+                      }}
+                    >
+                      {Moment(item.datetime).from(Moment(Now))}
+                    </span>
                   </div>
                   <div className='postOwner'>
                     <h6>
