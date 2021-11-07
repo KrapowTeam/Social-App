@@ -5,7 +5,7 @@ export const reducer = (state, action) => {
     return { ...state, email: action.payload };
   }
   if (action.type === 'USER') {
-    return { ...action.payload };
+    return { ...state, ...action.payload };
   }
   if (action.type === 'CLEAR') {
     return null;
@@ -14,6 +14,13 @@ export const reducer = (state, action) => {
     return {
       ...state,
       pic: action.payload,
+    };
+  }
+  if (action.type == 'UPDATENAME') {
+    console.log('name');
+    return {
+      ...state,
+      name: action.payload,
     };
   }
   if (action.type == 'UPDATE') {

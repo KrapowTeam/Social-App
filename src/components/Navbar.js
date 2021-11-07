@@ -1,9 +1,9 @@
 import React from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 import Logo from '../assets/Logo.png';
 import Home from '../assets/home.png';
 import user from '../assets/login.png';
-import key from '../assets/key.png';
+import followers from '../assets/followers.png';
 import post from '../assets/add.png';
 import logout from '../assets/logout.png';
 import './styles/Navbar.css';
@@ -14,7 +14,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 export default function Navbar() {
   const { state, dispatch } = React.useContext(UserContext);
   const history = useHistory();
-
+  const location = useLocation();
   const logout = () => {
     // let now = new Date();
     fetch('/logout', {
@@ -34,7 +34,21 @@ export default function Navbar() {
       {(state ?? '').name && (
         <nav>
           <div className='nav-wrapper'>
-            <img src={Logo} className='logo' alt='logoIcon' />
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                flexDirection: 'row',
+                alignItems: 'center',
+                alignContent: 'center',
+                flexWrap: 'wrap',
+              }}
+            >
+              <img src={Logo} className='logo' alt='logoIcon' />
+              <h2 style={{ marginLeft: '16px' }}>
+                {location.pathname.replace('/', '')}
+              </h2>
+            </div>
 
             <ul id='nav-mobile' className='right'>
               <li>
@@ -44,7 +58,7 @@ export default function Navbar() {
               </li>
               <li>
                 <Link to='/myfollowingpost'>
-                  <img src={Home} className='icon' alt='homeIcon' />
+                  <img src={followers} className='icon' alt='homeIcon' />
                 </Link>
               </li>
               {/* <li>

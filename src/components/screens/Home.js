@@ -148,10 +148,10 @@ export default function Home() {
       {loader === true ? (
         <div className='loader'></div>
       ) : data.length !== 0 ? (
-        data.map((item) => {
+        data.map((item, index) => {
           return (
             <>
-              <div className='card home-card'>
+              <div className='card home-card' key={index}>
                 <div className='card-image'>
                   <img alt='postImg' src={item.photo} />
                 </div>
@@ -254,7 +254,6 @@ export default function Home() {
                   </form>
                 </div>
               </div>
-              ;
             </>
           );
         })

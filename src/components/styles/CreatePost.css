@@ -20,7 +20,20 @@
   border-radius: 1vh;
   color: white;
   border: none;
+  z-index: 1050;
 }
 .btn-submit:hover {
+  background-color: rgba(255, 209, 69, 0.623);
+}
+
+.btn-cancel {
+  background-color: #ffd145;
+  padding: 10px;
+  border-radius: 1vh;
+  color: white;
+  border: none;
+  z-index: 1050;
+}
+.btn-cancel:hover {
   background-color: rgba(255, 209, 69, 0.623);
 }

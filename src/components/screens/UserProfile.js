@@ -21,6 +21,9 @@ export default function Profile() {
       .then((res) => res.json())
       .then((result) => {
         setProfile(result);
+        state
+          ? setShowFollow(!state.following.includes(userid))
+          : setShowFollow(true);
       })
       .catch((e) => {
         console.log('error ', e);
@@ -104,7 +107,7 @@ export default function Profile() {
               <div className='profile-user-settings'>
                 <h1 className='profile-user-name'>{userProfile.user.name}</h1>
 
-                <button className='btnp profile-edit-btnp'>Edit Profile</button>
+                {/* <button className='btnp profile-edit-btnp'>Edit Profile</button>
 
                 <button
                   className='btnp profile-settings-btnp'
@@ -114,7 +117,7 @@ export default function Profile() {
                     icon={faCog}
                     aria-hidden='true'
                   ></FontAwesomeIcon>
-                </button>
+                </button> */}
               </div>
 
               <div className='profile-stats'>
@@ -140,22 +143,22 @@ export default function Profile() {
                 </ul>
               </div>
 
-              <div className='profile-bio'>
+              {/* <div className='profile-bio'>
                 <p>
                   <span className='profile-real-name'>Stonk Man</span> I am
                   Investor
                 </p>
-              </div>
+              </div> */}
               {showfollow ? (
                 <button
-                  className='btn waves-effect waves-light #b645f6 blue darken-1'
+                  className='editProfileButton'
                   onClick={() => followUser()}
                 >
                   FOLLOW
                 </button>
               ) : (
                 <button
-                  className='btn waves-effect waves-light #b645f6 blue darken-1'
+                  className='editProfileButton'
                   onClick={() => unfollowUser()}
                 >
                   UNFOLLOW
@@ -165,8 +168,8 @@ export default function Profile() {
           </div>
           <div className='container'>
             <div className='gallery'>
-              {userProfile.posts.map((item) => (
-                <div className='gallery-item' tabindex='0'>
+              {userProfile.posts.map((item, index) => (
+                <div className='gallery-item' tabIndex='0' key={index}>
                   <img
                     className='pimg'
                     key={item._id}

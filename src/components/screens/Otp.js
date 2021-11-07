@@ -36,6 +36,7 @@ export default function Login() {
             classes: '#c62828 red darken-3',
           });
         } else {
+          console.log('after otp', data);
           localStorage.setItem('jwt', data.token);
           localStorage.setItem('user', JSON.stringify(data.user));
           dispatch({ type: 'USER', payload: data.user });
